@@ -139,7 +139,7 @@ export function FinanceView({ superadmin }: { superadmin: boolean }) {
   return (
     <div>
       <h1>Finance</h1>
-      <p className="muted">Net profit = net sales − cost of goods − operating expenses. Uncollected orders are not treated as cash.</p>
+      <p className="admin-note">Net profit = net sales − cost of goods − operating expenses. Uncollected orders stay separate from cash already collected.</p>
       <div className="stats">
         {[["Sales", money.sales], ["Collected", money.collected], ["Pending collection", money.pendingCollection], ["Delivery income", money.deliveryIncome], ["Refunds", money.refunds], ["Cost of goods", money.cogs], ["Expenses", money.expenses], ["Gross profit", money.grossProfit], ["Net profit", money.netProfit]].map(([label, value]) => (
           <article key={String(label)} className="stat"><span>{label}</span><strong>{inr(Number(value))}</strong></article>
@@ -206,15 +206,22 @@ export function ReviewsView() {
   return (
     <div>
       <h1>Reviews</h1>
-      {data.reviews.map((review) => (
-        <article key={review.id} className="info-card" style={{ marginBottom: 8 }}>
-          <strong>{review.authorName}</strong> {"★".repeat(review.rating)} · {review.approved ? "Published" : "Waiting"}
-          <p>{review.text}</p>
-          <button className="text-btn" type="button" onClick={async () => { await adminJson(`/api/admin/reviews/${review.id}`, { method: "PATCH", body: JSON.stringify({ approved: !review.approved }) }); load(); }}>
-            {review.approved ? "Hide" : "Approve"}
-          </button>
-        </article>
-      ))}
+      <div className="table-wrap">
+        <table>
+          <thead><tr><th>Customer</th><th>Rating</th><th>Review</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {data.reviews.map((review) => (
+              <tr key={review.id}>
+                <td data-label="Customer">{review.authorName}</td>
+                <td data-label="Rating">{"★".repeat(review.rating)}</td>
+                <td data-label="Review">{review.text}</td>
+                <td data-label="Status">{review.approved ? "Published" : "Waiting"}</td>
+                <td className="actions"><button className="text-btn" type="button" onClick={async () => { await adminJson(`/api/admin/reviews/${review.id}`, { method: "PATCH", body: JSON.stringify({ approved: !review.approved }) }); load(); }}>{review.approved ? "Hide" : "Approve"}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -284,8 +291,16 @@ export function SettingsView({ superadmin }: { superadmin: boolean }) {
           setSettings(data.settings);
         } catch (err) { setError(err instanceof Error ? err.message : "Save failed"); }
       }}>
-        {["storeName", "phone", "whatsapp", "email", "address", "hours", "serviceAreas"].map((field) => (
-          <label className="field" key={field}><span>{field}</span>
+        {([
+          ["storeName", "Store name"],
+          ["phone", "Phone"],
+          ["whatsapp", "WhatsApp"],
+          ["email", "Email"],
+          ["address", "Address"],
+          ["hours", "Hours"],
+          ["serviceAreas", "Delivery areas"],
+        ] as const).map(([field, label]) => (
+          <label className="field" key={field}><span>{label}</span>
             <input value={String(settings[field] || "")} onChange={(event) => setSettings({ ...settings, [field]: event.target.value })} />
           </label>
         ))}

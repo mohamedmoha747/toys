@@ -85,6 +85,7 @@ export function OrdersView({ superadmin }: { superadmin: boolean }) {
             {open.items.map((item) => <li key={item.productId}><span>{item.qty} × {item.name}</span><strong>{inr(item.subtotal)}</strong></li>)}
           </ul>
           <details className="fold"><summary>WhatsApp message</summary><pre>{open.whatsappText}</pre></details>
+          <div className="admin-fields">
           <label className="field"><span>Status</span>
             <select value={open.status} onChange={(event) => save({ status: event.target.value })}>
               {orderStatuses.map((item) => <option key={item}>{item}</option>)}
@@ -94,6 +95,7 @@ export function OrdersView({ superadmin }: { superadmin: boolean }) {
           <label className="field"><span>Cancel / return reason</span><input defaultValue={open.cancelReason} onBlur={(event) => save({ cancelReason: event.target.value })} /></label>
           <label className="field"><span>Amount collected</span><input defaultValue={open.amountCollected} onBlur={(event) => save({ amountCollected: Number(event.target.value) })} /></label>
           {superadmin ? <label className="field"><span>Refund</span><input defaultValue={open.refundAmount} onBlur={(event) => save({ refundAmount: Number(event.target.value), collectionStatus: "refunded" })} /></label> : null}
+          </div>
           <Link className="ghost" href={`/admin/orders/${open.id}`}>Print invoice</Link>
         </section>
       ) : null}

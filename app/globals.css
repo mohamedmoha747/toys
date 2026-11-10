@@ -864,3 +864,137 @@ table { min-width: 640px; }
   .admin-frame td:first-child::before, .admin-frame td.actions::before { content: none; }
   .admin-frame td.actions { justify-content: flex-end; }
 }
+
+/* Admin console: separate from the shop chrome, compact controls */
+body:has(.admin-frame) {
+  background: #eef0f3;
+  padding-bottom: 0;
+}
+body:has(.admin-frame) .site-header,
+body:has(.admin-frame) .site-footer,
+body:has(.admin-frame) .bottom-nav {
+  display: none !important;
+}
+.admin-frame {
+  width: min(1180px, calc(100% - 28px));
+  margin: 16px auto 28px;
+}
+.admin-main h1 {
+  font-size: 20px;
+  line-height: 1.2;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+.admin-main h2 { font-size: 14px; margin: 0; }
+.admin-note {
+  margin: -4px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.admin-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.admin-frame .panel,
+.admin-frame .stat,
+.admin-frame .table-wrap,
+.admin-frame .info-card,
+.admin-nav {
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.admin-frame .field span { font-size: 12px; font-weight: 650; color: #4b5160; }
+.admin-frame .field input,
+.admin-frame .field select,
+.admin-frame .field textarea,
+.admin-frame .shop-search input,
+.admin-frame .shop-search select,
+.admin-toolbar input,
+.admin-toolbar select {
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+}
+.admin-frame .primary,
+.admin-frame .ghost,
+.admin-frame a.ghost,
+.admin-toolbar .primary,
+.profile-actions .primary,
+.profile-actions .ghost,
+.admin-frame .shop-search button,
+.admin-frame .shop-search .ghost {
+  width: auto;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-frame .text-btn {
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 650;
+  border-radius: 6px;
+}
+.admin-nav a,
+.admin-drawer a {
+  padding: 6px 10px;
+  min-height: 32px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.admin-nav a.on,
+.admin-drawer a.on { background: #161616; color: #fff; }
+.admin-logout { padding: 4px 10px; font-size: 12px; font-weight: 650; }
+.status-pill { padding: 4px 8px; font-size: 12px; font-weight: 650; }
+.admin-frame .stack-form,
+.admin-frame .form-grid { gap: 8px; }
+.admin-frame .stack-form { max-width: 640px; }
+@media (max-width: 979px) {
+  .admin-frame {
+    width: 100%;
+    margin: 0;
+    padding: 0 12px 20px;
+    gap: 10px;
+  }
+  .admin-bar {
+    top: 0;
+    margin: 0 -12px 4px;
+    border-radius: 0;
+    padding: 6px 10px 6px 4px;
+  }
+  .admin-main h1 { font-size: 18px; }
+  .admin-fields { grid-template-columns: 1fr; }
+  .admin-frame .stat strong { font-size: 16px; }
+  .admin-frame td:first-child {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .profile-layout { gap: 10px; }
+  .profile-card { padding: 12px; }
+  .avatar-wrap, .avatar-photo { width: 84px; height: 84px; }
+  .profile-name { font-size: 18px; }
+  .profile-tabs button { padding: 8px 10px; font-size: 13px; font-weight: 650; }
+}
+@media (min-width: 980px) {
+  .admin-nav { padding: 8px; border-radius: 12px; gap: 2px; }
+  .admin-frame .shop-search { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .admin-frame .shop-search button,
+  .admin-frame .shop-search .ghost { justify-self: start; }
+}
