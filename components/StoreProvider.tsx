@@ -24,8 +24,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedCart = JSON.parse(localStorage.getItem("lms-cart") || "[]") as Line[];
-      const savedWish = JSON.parse(localStorage.getItem("lms-wish") || "[]") as string[];
+      const savedCart = JSON.parse(localStorage.getItem("limee-cart") || "[]") as Line[];
+      const savedWish = JSON.parse(localStorage.getItem("limee-wish") || "[]") as string[];
       setLines(Array.isArray(savedCart) ? savedCart : []);
       setWishlist(Array.isArray(savedWish) ? savedWish : []);
     } catch {
@@ -36,11 +36,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (ready) localStorage.setItem("lms-cart", JSON.stringify(lines));
+    if (ready) localStorage.setItem("limee-cart", JSON.stringify(lines));
   }, [lines, ready]);
 
   useEffect(() => {
-    if (ready) localStorage.setItem("lms-wish", JSON.stringify(wishlist));
+    if (ready) localStorage.setItem("limee-wish", JSON.stringify(wishlist));
   }, [wishlist, ready]);
 
   const value = useMemo<Store>(() => {

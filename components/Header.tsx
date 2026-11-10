@@ -3,19 +3,25 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import type { Category } from "@/lib/types";
-import { site, waLink } from "@/lib/site";
+import type { Category, PublicSettings } from "@/lib/types";
+import { waLink } from "@/lib/site";
+import { Brand } from "./Brand";
 import { IconBag, IconClose, IconHeart, IconMenu } from "./Icons";
 import { SearchBar } from "./SearchBar";
 import { useStore } from "./StoreProvider";
 
-export function Header({ categories }: { categories: Category[] }) {
+export function Header({ categories, settings }: { categories: Category[]; settings: PublicSettings }) {
   const { count } = useStore();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
     setOpen(false);
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => setUser(data.user || null))
+      .catch(() => setUser(null));
   }, [pathname]);
 
   useEffect(() => {
@@ -48,9 +54,9 @@ export function Header({ categories }: { categories: Category[] }) {
               <Link href="/faq">FAQ</Link>
             </div>
             <div className="top-meta">
-              <span>{site.hours}</span>
+              <span>{settings.hours}</span>
               <span className="dot" />
-              <a href={`tel:+${site.phoneTel}`}>{site.phone}</a>
+              <a href={`tel:+${settings.phoneTel}`}>{settings.phone}</a>
               <Link href="/admin">Admin</Link>
             </div>
           </div>
@@ -59,15 +65,12 @@ export function Header({ categories }: { categories: Category[] }) {
           <button className="icon-btn menu-btn" type="button" aria-label="Open menu" onClick={() => setOpen(true)}>
             <IconMenu />
           </button>
-          <Link href="/" className="brand" aria-label="LMS home">
-            <span className="brand-mark">LMS</span>
-            <span className="brand-tag">RC Toys</span>
-          </Link>
+          <Brand />
           <div className="nav-search">
             <SearchBar />
           </div>
           <div className="nav-actions">
-            <a className="enquiry" href={waLink("Hi LMS, I have a product enquiry.")}>
+            <a className="enquiry" href={waLink("Hi Limee Toys, I have a product enquiry.", settings.phoneTel)}>
               Enquiry
             </a>
             <Link href="/wishlist" className="icon-btn" aria-label="Wishlist">
@@ -97,7 +100,10 @@ export function Header({ categories }: { categories: Category[] }) {
         <div className="drawer-backdrop" onClick={() => setOpen(false)}>
           <aside className="drawer" role="dialog" aria-label="Menu" onClick={(event) => event.stopPropagation()}>
             <div className="drawer-head">
-              <strong>LMS</strong>
+              <span className="drawer-brand">
+                <img src="/limee-logo.jpg" alt="" className="brand-logo" />
+                <strong>Limee Toys</strong>
+              </span>
               <button className="icon-btn" type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
                 <IconClose />
               </button>
@@ -110,6 +116,7 @@ export function Header({ categories }: { categories: Category[] }) {
             <Link href="/faq">FAQ</Link>
             <Link href="/cart">Cart</Link>
             <Link href="/wishlist">Wishlist</Link>
+            <Link href={user ? "/account" : "/login"}>{user ? "My account" : "Login"}</Link>
             <Link href="/admin">Admin</Link>
             <h3>Categories</h3>
             {categories.map((category) => (

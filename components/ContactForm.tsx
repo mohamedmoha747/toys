@@ -14,7 +14,7 @@ export function ContactForm() {
       onSubmit={(event) => {
         event.preventDefault();
         window.open(
-          waLink(`Hi LMS, this is ${name} (${phone}). ${message}`),
+          waLink(`Hi Limee Toys, this is ${name} (${phone}). ${message}`),
           "_blank",
           "noopener,noreferrer",
         );

@@ -8,7 +8,7 @@ export default function TrackPage() {
     <div className="wrap page" style={{ maxWidth: 640 }}>
       <div className="page-head">
         <h1>Track your order</h1>
-        <p className="muted">Enter the order ID from your LMS confirmation.</p>
+        <p className="muted">Enter the order ID from your Limee Toys confirmation.</p>
       </div>
       <TrackForm />
     </div>

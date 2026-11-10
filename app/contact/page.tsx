@@ -8,7 +8,7 @@ export default function ContactPage() {
   return (
     <div className="wrap page">
       <div className="page-head">
-        <h1>Contact LMS</h1>
+        <h1>Contact Limee Toys</h1>
         <p className="muted">Ask about stock, a bundle, or a spare before it sells out.</p>
       </div>
       <div className="contact-grid" style={{ display: "grid", gap: 16 }}>
@@ -23,7 +23,7 @@ export default function ContactPage() {
             <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
           <p>
-            <a className="wa-btn" href={waLink("Hi LMS, I have a question.")} target="_blank" rel="noreferrer">
+            <a className="wa-btn" href={waLink("Hi Limee Toys, I have a question.")} target="_blank" rel="noreferrer">
               Open WhatsApp
             </a>
           </p>

@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: ProductView }) {
     <article className="product-card">
       <div className="visual-wrap">
         <Link href={`/product/${product.slug}`} aria-label={product.name}>
-          <ProductVisual kind={product.kind} tone={product.tone} />
+          {product.images[0] ? <img className="visual" src={product.images[0]} alt="" /> : <ProductVisual kind={product.kind} tone={product.tone} />}
         </Link>
         {product.badge ? <span className="badge">{product.badge}</span> : null}
         {product.stock <= 0 ? <span className="pill-stock">Sold out</span> : null}
@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: ProductView }) {
         <div className="card-actions">
           <a
             className="wa-btn"
-            href={waLink(`Hi LMS, I want to know about ${product.name}.`)}
+            href={waLink(`Hi Limee Toys, I want to know about ${product.name}.`)}
             target="_blank"
             rel="noreferrer"
           >

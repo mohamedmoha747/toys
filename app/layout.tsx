@@ -4,7 +4,7 @@ import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { StoreProvider } from "@/components/StoreProvider";
-import { readDb } from "@/lib/db";
+import { getSettings, listCategories } from "@/lib/shop";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -14,23 +14,19 @@ const outfit = Outfit({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: {
-    default: "LMS RC Toys",
-    template: "%s · LMS RC Toys",
-  },
-  description: "Shop remote control cars, drones, boats, planes, helicopters and spare parts at LMS.",
+  title: { default: "Limee Toys", template: "%s · Limee Toys" },
+  description: "Shop baby toys, educational toys, remote-control cars, soft toys, blocks, games and outdoor toys at Limee Toys.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { categories } = readDb();
-
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [categories, settings] = await Promise.all([listCategories(), getSettings()]);
   return (
     <html lang="en">
       <body className={outfit.className}>
         <StoreProvider>
-          <Header categories={categories} />
+          <Header categories={categories} settings={settings} />
           <main id="content">{children}</main>
-          <Footer categories={categories} />
+          <Footer categories={categories} settings={settings} />
         </StoreProvider>
       </body>
     </html>

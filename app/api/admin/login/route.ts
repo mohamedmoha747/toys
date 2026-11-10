@@ -1,6 +1,3 @@
-import { isAdmin } from "@/lib/auth";
-
-export async function POST(req: Request) {
-  if (!isAdmin(req)) return Response.json({ error: "Wrong password" }, { status: 401 });
-  return Response.json({ ok: true });
+export async function POST() {
+  return Response.json({ error: "Use /api/auth/login" }, { status: 410 });
 }

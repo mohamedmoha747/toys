@@ -33,7 +33,7 @@ export function ProductActions({ product }: { product: ProductView }) {
       >
         {max === 0 ? "Out of stock" : added ? "Added to cart" : "Add to cart"}
       </button>
-      <a className="wa-btn" href={waLink(`Hi LMS, I want to order ${qty} x ${product.name}.`)} target="_blank" rel="noreferrer">
+      <a className="wa-btn" href={waLink(`Hi Limee Toys, I want to order ${qty} x ${product.name}.`)} target="_blank" rel="noreferrer">
         WhatsApp enquiry
       </a>
     </div>

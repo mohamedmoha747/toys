@@ -7,11 +7,11 @@ export default function AboutPage() {
   return (
     <div className="wrap page prose">
       <div className="page-head">
-        <h1>About LMS</h1>
+        <h1>About Limee Toys</h1>
         <p className="muted">{site.tagline}</p>
       </div>
       <p>
-        LMS RC Toys is a Chennai hobby shop for people who want a kit that runs the same day it arrives. We stock
+        Limee Toys is a Chennai hobby shop for people who want a kit that runs the same day it arrives. We stock
         remote-control cars, drones, boats, planes, helicopters, and the batteries and parts that keep them in the air
         or on the ground.
       </p>

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { Category } from "@/lib/types";
-import { site } from "@/lib/site";
+import type { Category, PublicSettings } from "@/lib/types";
+import { Brand } from "./Brand";
 
-export function Footer({ categories }: { categories: Category[] }) {
+export function Footer({ categories, settings }: { categories: Category[]; settings: PublicSettings }) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
 
@@ -13,12 +13,9 @@ export function Footer({ categories }: { categories: Category[] }) {
     <footer className="site-footer">
       <div className="wrap foot-grid">
         <div className="foot-brand">
-          <div className="brand" style={{ justifyItems: "start" }}>
-            <span className="brand-mark">LMS</span>
-            <span className="brand-tag">RC Toys</span>
-          </div>
+          <Brand />
           <p style={{ marginTop: 12 }}>
-            Remote-control cars, drones, boats, planes and the parts that keep them running. {site.tagline}
+            Baby toys, learning toys, remote-control cars, games and outdoor play from Limee Toys.
           </p>
         </div>
         <div>
@@ -51,9 +48,10 @@ export function Footer({ categories }: { categories: Category[] }) {
             <li><Link href="/faq">FAQ</Link></li>
           </ul>
           <h3 style={{ marginTop: 18 }}>Get in touch</h3>
-          <p>{site.address}</p>
-          <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
-          <p><a href={`tel:+${site.phoneTel}`}>{site.phone}</a></p>
+          <p>{settings.address}</p>
+          <p><a href={`mailto:${settings.email}`}>{settings.email}</a></p>
+          <p><a href={`tel:+${settings.phoneTel}`}>{settings.phone}</a></p>
+          <p>Free delivery over ₹{settings.freeDeliveryOver.toLocaleString("en-IN")}. Areas: {settings.serviceAreas}.</p>
           <form
             className="news"
             onSubmit={(event) => {
@@ -80,7 +78,7 @@ export function Footer({ categories }: { categories: Category[] }) {
           </form>
         </div>
       </div>
-      <div className="wrap legal">© {new Date().getFullYear()} LMS RC Toys. All rights reserved.</div>
+      <div className="wrap legal">© {new Date().getFullYear()} Limee Toys. All rights reserved.</div>
     </footer>
   );
 }

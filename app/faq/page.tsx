@@ -17,11 +17,11 @@ const faqs = [
   },
   {
     q: "What if a part breaks?",
-    a: "Most LMS chassis have arms, turnbuckles and props on the parts shelf. Message the model name and we will check the bin.",
+    a: "Most Limee Toys chassis have arms, turnbuckles and props on the parts shelf. Message the model name and we will check the bin.",
   },
   {
     q: "How do I track an order?",
-    a: "Open Track order and enter the LMS order ID from your confirmation message.",
+    a: "Open Track order and enter the Limee Toys order ID from your confirmation message.",
   },
 ];
 

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { ProductVisual } from "@/components/ProductVisual";
 import { useStore } from "@/components/StoreProvider";
 import { inr } from "@/lib/format";
-import { waLink } from "@/lib/site";
 import type { ProductView } from "@/lib/types";
 
 export default function CartPage() {
@@ -85,9 +84,8 @@ export default function CartPage() {
               Total <strong>{inr(total)}</strong>
             </p>
             <p className="muted">{total >= 2999 ? "This order qualifies for free Tamil Nadu delivery." : "Add a little more for free delivery over ₹2,999."}</p>
-            <a className="wa-btn" href={waLink(`Hi LMS, I want to order: ${summary}. Total ${inr(total)}.`)}>
-              Checkout on WhatsApp
-            </a>
+            <Link className="primary" href="/checkout">Checkout</Link>
+            <p className="muted">Checkout saves the order and opens WhatsApp with the full bill. {summary ? `Preview: ${summary}` : ""}</p>
             <Link className="ghost" href="/shop">
               Continue shopping
             </Link>
