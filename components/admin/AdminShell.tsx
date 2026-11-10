@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { IconClose, IconMenu } from "../Icons";
 
 const links = [
   ["Overview", "/admin"],
@@ -21,28 +23,68 @@ const links = [
 
 export function AdminShell({ name, role, children }: { name: string; role: string; children: React.ReactNode }) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const items = links.filter(([label]) => role === "superadmin" || label !== "Finance");
+  const current = items.find(([, href]) => href === pathname)?.[0] ?? "Admin";
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/admin/login";
+  }
+
+  const nav = (
+    <>
+      <div className="admin-who">
+        <strong>{name}</strong>
+        <span className="muted">{role}</span>
+      </div>
+      {items.map(([label, href]) => (
+        <Link key={href} href={href} className={pathname === href ? "on" : ""}>
+          {label}
+        </Link>
+      ))}
+      <button className="ghost" type="button" onClick={logout}>
+        Log out
+      </button>
+    </>
+  );
+
   return (
     <div className="admin-frame">
-      <aside className="admin-nav">
-        <strong style={{ padding: "4px 10px" }}>{name}</strong>
-        <span className="muted" style={{ padding: "0 10px 8px" }}>{role}</span>
-        {links.filter(([label]) => role === "superadmin" || label !== "Finance").map(([label, href]) => (
-          <Link key={href} href={href} className={pathname === href ? "on" : ""}>
-            {label}
-          </Link>
-        ))}
-        <button
-          className="ghost"
-          type="button"
-          onClick={async () => {
-            await fetch("/api/auth/logout", { method: "POST" });
-            window.location.href = "/admin/login";
-          }}
-        >
-          Log out
+      <header className="admin-bar">
+        <button className="icon-btn" type="button" aria-label="Open admin menu" onClick={() => setOpen(true)}>
+          <IconMenu />
         </button>
-      </aside>
-      <div>{children}</div>
+        <strong>{current}</strong>
+      </header>
+      {open ? (
+        <div className="admin-backdrop" onClick={() => setOpen(false)}>
+          <aside className="admin-drawer" role="dialog" aria-label="Admin menu" onClick={(event) => event.stopPropagation()}>
+            <div className="admin-drawer-head">
+              <strong>Admin</strong>
+              <button className="icon-btn" type="button" aria-label="Close admin menu" onClick={() => setOpen(false)}>
+                <IconClose />
+              </button>
+            </div>
+            {nav}
+          </aside>
+        </div>
+      ) : null}
+      <aside className="admin-nav">{nav}</aside>
+      <div className="admin-main">{children}</div>
     </div>
   );
 }

@@ -127,24 +127,61 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
   );
 }
 
-export function CategoriesView() {
+const kindOptions = [
+  ["parts", "General"],
+  ["car", "Car"],
+  ["drone", "Gadget"],
+  ["boat", "Outdoor"],
+  ["plane", "Learning"],
+  ["heli", "Soft toy"],
+] as const;
+
+export function CategoriesView({ superadmin }: { superadmin: boolean }) {
   const [categories, setCategories] = useState<CategoryView[]>([]);
+  const [products, setProducts] = useState<ProductView[]>([]);
   const [name, setName] = useState("");
   const [kind, setKind] = useState("parts");
   const [description, setDescription] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<CategoryView | null>(null);
   const [error, setError] = useState("");
+  const [note, setNote] = useState("");
+
+  function toysIn(categoryId: string) {
+    return products.filter((product) => product.categoryId === categoryId);
+  }
 
   function load() {
-    adminJson("/api/admin/categories").then((data) => setCategories(data.categories)).catch((err: Error) => setError(err.message));
+    Promise.all([adminJson("/api/admin/categories"), adminJson("/api/admin/products")])
+      .then(([categoryData, productData]) => {
+        setCategories(categoryData.categories);
+        setProducts(productData.products);
+      })
+      .catch((err: Error) => setError(err.message));
   }
   useEffect(() => { load(); }, []);
+
+  async function removeToy(categoryName: string, product: ProductView) {
+    if (!confirm(`Remove ${product.name} from ${categoryName}? This deletes that one toy. The other toys in this category stay.`)) return;
+    setError("");
+    setNote("");
+    try {
+      const result = await adminJson(`/api/admin/products/${product.id}`, { method: "DELETE" });
+      if (result.hidden) setNote(`${product.name} is already on an order, so it was hidden instead of deleted.`);
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Remove failed");
+    }
+  }
 
   return (
     <div>
       <h1>Categories</h1>
       {error ? <p className="form-error">{error}</p> : null}
+      {note ? <p className="banner-ok">{note}</p> : null}
       <form className="stack-form" style={{ maxWidth: 480 }} onSubmit={async (event) => {
         event.preventDefault();
+        setError("");
         try {
           await adminJson("/api/admin/categories", { method: "POST", body: JSON.stringify({ name, kind, description }) });
           setName(""); setDescription(""); load();
@@ -153,29 +190,73 @@ export function CategoriesView() {
         <label className="field"><span>Name</span><input value={name} onChange={(event) => setName(event.target.value)} required /></label>
         <label className="field"><span>Illustration</span>
           <select value={kind} onChange={(event) => setKind(event.target.value)}>
-            <option value="parts">General</option><option value="car">Car</option><option value="drone">Gadget</option>
-            <option value="boat">Outdoor</option><option value="plane">Learning</option><option value="heli">Soft toy</option>
+            {kindOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
         <label className="field"><span>Description</span><input value={description} onChange={(event) => setDescription(event.target.value)} required /></label>
         <button className="primary" type="submit">Add category</button>
       </form>
-      <div className="table-wrap" style={{ marginTop: 12 }}>
-        <table>
-          <thead><tr><th>Name</th><th>Toys</th><th></th></tr></thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.id}>
-                <td>{category.name}</td>
-                <td>{category.productCount}</td>
-                <td><button className="text-btn danger" type="button" onClick={async () => {
-                  try { await adminJson(`/api/admin/categories/${category.id}`, { method: "DELETE" }); load(); }
-                  catch (err) { setError(err instanceof Error ? err.message : "Delete failed"); }
-                }}>Delete</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="category-list">
+        {categories.map((category) => {
+          const toys = toysIn(category.id);
+          const open = openId === category.id;
+          return (
+            <article className="panel category-card" key={category.id}>
+              <div className="admin-top">
+                <div>
+                  <strong>{category.name}</strong>
+                  <p className="muted">{toys.length} toy{toys.length === 1 ? "" : "s"}</p>
+                </div>
+                <div className="actions">
+                  <button className="text-btn" type="button" onClick={() => setOpenId(open ? null : category.id)}>{open ? "Hide toys" : "Toys"}</button>
+                  <button className="text-btn" type="button" onClick={() => { setEditing(category); setOpenId(category.id); }}>Edit</button>
+                  {superadmin ? <button className="text-btn danger" type="button" onClick={async () => {
+                    if (!confirm(`Delete ${category.name}? Remove its toys first if any are still listed.`)) return;
+                    setError("");
+                    try { await adminJson(`/api/admin/categories/${category.id}`, { method: "DELETE" }); if (openId === category.id) setOpenId(null); load(); }
+                    catch (err) { setError(err instanceof Error ? err.message : "Delete failed"); }
+                  }}>Delete</button> : null}
+                </div>
+              </div>
+              {open && editing?.id === category.id ? (
+                <form className="stack-form" onSubmit={async (event) => {
+                  event.preventDefault();
+                  setError("");
+                  try {
+                    await adminJson(`/api/admin/categories/${category.id}`, {
+                      method: "PATCH",
+                      body: JSON.stringify({ name: editing.name, kind: editing.kind, description: editing.description }),
+                    });
+                    setEditing(null);
+                    load();
+                  } catch (err) { setError(err instanceof Error ? err.message : "Update failed"); }
+                }}>
+                  <label className="field"><span>Name</span><input value={editing.name} onChange={(event) => setEditing({ ...editing, name: event.target.value })} required /></label>
+                  <label className="field"><span>Illustration</span>
+                    <select value={editing.kind} onChange={(event) => setEditing({ ...editing, kind: event.target.value as CategoryView["kind"] })}>
+                      {kindOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    </select>
+                  </label>
+                  <label className="field"><span>Description</span><input value={editing.description} onChange={(event) => setEditing({ ...editing, description: event.target.value })} required /></label>
+                  <div className="actions">
+                    <button className="primary" type="submit">Save category</button>
+                    <button className="ghost" type="button" onClick={() => setEditing(null)}>Cancel</button>
+                  </div>
+                </form>
+              ) : null}
+              {open ? (
+                <div>
+                  {toys.length === 0 ? <p className="muted">No toys in this category.</p> : toys.map((toy) => (
+                    <div className="toy-row" key={toy.id}>
+                      <span><strong>{toy.name}</strong>{toy.active ? "" : " · Hidden"}</span>
+                      {superadmin ? <button className="text-btn danger" type="button" onClick={() => removeToy(category.name, toy)}>Remove</button> : null}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

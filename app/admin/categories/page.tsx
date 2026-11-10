@@ -8,7 +8,7 @@ export default async function CategoriesPage() {
   const session = await requireStaffPage();
   return (
     <AdminShell name={session.name} role={session.role}>
-      <CategoriesView />
+      <CategoriesView superadmin={session.role === "superadmin"} />
     </AdminShell>
   );
 }
