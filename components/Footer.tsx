@@ -66,7 +66,7 @@ export function Footer({ categories, settings }: { categories: Category[]; setti
           >
             <h3 style={{ marginTop: 16 }}>Stay updated</h3>
             <p>New kits, spares and weekend offers.</p>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="news-row">
               <input
                 type="email"
                 required

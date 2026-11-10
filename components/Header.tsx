@@ -103,8 +103,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
           <aside className="drawer" role="dialog" aria-label="Menu" onClick={(event) => event.stopPropagation()}>
             <div className="drawer-head">
               <span className="drawer-brand">
-                <img src="/limee-logo.jpg" alt="" className="brand-logo" />
-                <strong>Limee Toys</strong>
+                <img src="/lm-logo.png" alt="LM" className="brand-logo" />
               </span>
               <button className="icon-btn" type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
                 <IconClose />

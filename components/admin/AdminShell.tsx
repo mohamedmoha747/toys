@@ -18,6 +18,7 @@ const links = [
   ["Coupons", "/admin/coupons"],
   ["Reviews", "/admin/reviews"],
   ["Reports", "/admin/reports"],
+  ["My Profile", "/admin/account"],
   ["Settings", "/admin/settings"],
 ];
 
@@ -50,15 +51,15 @@ export function AdminShell({ name, role, children }: { name: string; role: strin
       <div className="admin-who">
         <strong>{name}</strong>
         <span className="muted">{role}</span>
+        <button className="admin-logout" type="button" onClick={logout}>
+          Log out
+        </button>
       </div>
       {items.map(([label, href]) => (
         <Link key={href} href={href} className={pathname === href ? "on" : ""}>
           {label}
         </Link>
       ))}
-      <button className="ghost" type="button" onClick={logout}>
-        Log out
-      </button>
     </>
   );
 
@@ -69,6 +70,9 @@ export function AdminShell({ name, role, children }: { name: string; role: strin
           <IconMenu />
         </button>
         <strong>{current}</strong>
+        <button className="admin-logout" type="button" onClick={logout}>
+          Log out
+        </button>
       </header>
       {open ? (
         <div className="admin-backdrop" onClick={() => setOpen(false)}>

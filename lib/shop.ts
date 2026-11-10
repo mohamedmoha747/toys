@@ -324,6 +324,7 @@ export async function loginUser(email: string, password: string): Promise<Sessio
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     throw new ServiceError("Email or password is wrong", 401);
   }
+  if (user.active === false) throw new ServiceError("This account is inactive", 403);
   return { id: String(user._id), name: user.name, email: user.email, role: user.role };
 }
 
@@ -342,6 +343,88 @@ export async function getAccount(userId: string) {
       line: item.line || "",
     })),
   };
+}
+
+export type StaffProfile = {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  organization: string;
+  photo: string;
+  role: SessionUser["role"];
+  active: boolean;
+  createdAt: string;
+  notifyOrders: boolean;
+  notifyStock: boolean;
+};
+
+function toStaffProfile(user: {
+  _id: unknown;
+  name: string;
+  email: string;
+  mobile?: string;
+  organization?: string;
+  photo?: string;
+  role: SessionUser["role"];
+  active?: boolean;
+  createdAt?: Date;
+  notifyOrders?: boolean;
+  notifyStock?: boolean;
+}): StaffProfile {
+  return {
+    id: String(user._id),
+    name: user.name,
+    email: user.email,
+    mobile: String(user.mobile || ""),
+    organization: user.organization || "Limee Toys",
+    photo: user.photo || "",
+    role: user.role,
+    active: user.active !== false,
+    createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : "",
+    notifyOrders: user.notifyOrders !== false,
+    notifyStock: user.notifyStock !== false,
+  };
+}
+
+export async function getStaffProfile(userId: string) {
+  await connectDb();
+  const user = await UserModel.findById(userId).lean();
+  if (!user) throw new ServiceError("Account not found", 404);
+  return toStaffProfile(user as Parameters<typeof toStaffProfile>[0]);
+}
+
+export async function updateStaffProfile(userId: string, body: Record<string, unknown>) {
+  await connectDb();
+  const user = await UserModel.findById(userId);
+  if (!user) throw new ServiceError("Account not found", 404);
+  const name = String(body.name ?? user.name).trim().slice(0, 80);
+  if (name.length < 2) throw new ServiceError("Full name is required");
+  const email = String(body.email ?? user.email).trim().toLowerCase();
+  if (!email.includes("@")) throw new ServiceError("Enter a valid email");
+  const taken = await UserModel.exists({ email, _id: { $ne: user._id } });
+  if (taken) throw new ServiceError("That email is already used");
+  const photo = String(body.photo ?? user.photo ?? "").trim().slice(0, 240);
+  if (photo && !photo.startsWith("/uploads/")) throw new ServiceError("Upload a photo from this page");
+  user.name = name;
+  user.email = email;
+  user.mobile = String(body.mobile ?? user.mobile ?? "").trim().slice(0, 20);
+  user.organization = String(body.organization ?? user.organization ?? "Limee Toys").trim().slice(0, 80) || "Limee Toys";
+  user.photo = photo;
+  if (body.notifyOrders != null) user.notifyOrders = Boolean(body.notifyOrders);
+  if (body.notifyStock != null) user.notifyStock = Boolean(body.notifyStock);
+  const nextPassword = String(body.newPassword || "");
+  if (nextPassword) {
+    if (!(await bcrypt.compare(String(body.currentPassword || ""), user.passwordHash))) {
+      throw new ServiceError("Current password is wrong", 401);
+    }
+    if (nextPassword.length < 6) throw new ServiceError("New password must be at least 6 characters");
+    if (nextPassword !== String(body.confirmPassword || "")) throw new ServiceError("New passwords do not match");
+    user.passwordHash = await bcrypt.hash(nextPassword, 10);
+  }
+  await user.save();
+  await logActivity("profile.updated", user.email, { name: user.name, role: user.role });
+  return toStaffProfile(user.toObject() as Parameters<typeof toStaffProfile>[0]);
 }
 
 export async function updateAccount(userId: string, input: { name?: string; mobile?: string; address?: string }) {
