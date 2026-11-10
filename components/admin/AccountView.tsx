@@ -123,12 +123,12 @@ export function AccountView() {
           </div>
           <strong className="profile-name">{draft.name}</strong>
           <span className="role-pill">{roleLabel[draft.role]}</span>
-          <div className="profile-meta">
-            <p>{draft.email}</p>
-            <p>{draft.mobile || "No phone yet"}</p>
-            <p>{draft.organization}</p>
-            <p>Joined {joined(draft.createdAt)}</p>
-          </div>
+          <dl className="profile-meta">
+            <div><dt>Email</dt><dd>{draft.email}</dd></div>
+            <div><dt>Phone</dt><dd>{draft.mobile || "—"}</dd></div>
+            <div><dt>Brand</dt><dd>{draft.organization}</dd></div>
+            <div><dt>Joined</dt><dd>{joined(draft.createdAt)}</dd></div>
+          </dl>
         </aside>
         <section className="panel">
           <div className="profile-tabs" role="tablist">

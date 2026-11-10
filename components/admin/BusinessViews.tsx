@@ -27,8 +27,8 @@ export function CustomersView() {
           <tbody>
             {data.customers.map((customer) => (
               <tr key={customer.id}>
-                <td>{customer.name}</td><td>{customer.mobile}</td><td>{customer.email}</td>
-                <td>{customer.orders}</td><td>{inr(customer.total)}</td><td>{customer.addresses?.[0]?.line}</td>
+                <td data-label="Name">{customer.name}</td><td data-label="Mobile">{customer.mobile}</td><td data-label="Email">{customer.email}</td>
+                <td data-label="Orders">{customer.orders}</td><td data-label="Total">{inr(customer.total)}</td><td data-label="Address">{customer.addresses?.[0]?.line}</td>
               </tr>
             ))}
           </tbody>
@@ -59,7 +59,7 @@ export function SuppliersView() {
       </form>
       <div className="table-wrap" style={{ marginTop: 12 }}>
         <table><thead><tr><th>Name</th><th>Company</th><th>Phone</th><th>Address</th></tr></thead>
-          <tbody>{data.suppliers.map((item) => <tr key={item.id}><td>{item.name}</td><td>{item.company}</td><td>{item.phone}</td><td>{item.address}</td></tr>)}</tbody>
+          <tbody>{data.suppliers.map((item) => <tr key={item.id}><td data-label="Name">{item.name}</td><td data-label="Company">{item.company}</td><td data-label="Phone">{item.phone}</td><td data-label="Address">{item.address}</td></tr>)}</tbody>
         </table>
       </div>
     </div>
@@ -114,8 +114,8 @@ export function PurchasesView() {
           <tbody>
             {data.purchases.map((item) => (
               <tr key={item.id}>
-                <td>{item.supplierName}</td><td>{item.status}</td><td>{inr(item.total)}</td><td>{inr(item.amountPaid)}</td><td>{inr(item.balance)}</td>
-                <td>{item.status === "draft" ? <button className="text-btn" type="button" onClick={async () => {
+                <td data-label="Supplier">{item.supplierName}</td><td data-label="Status">{item.status}</td><td data-label="Total">{inr(item.total)}</td><td data-label="Paid">{inr(item.amountPaid)}</td><td data-label="Balance">{inr(item.balance)}</td>
+                <td className="actions">{item.status === "draft" ? <button className="text-btn" type="button" onClick={async () => {
                   try { await adminJson(`/api/admin/purchases/${item.id}`, { method: "PATCH", body: "{}" }); load(); }
                   catch (err) { setError(err instanceof Error ? err.message : "Approve failed"); }
                 }}>Approve and add stock</button> : null}</td>
@@ -162,7 +162,7 @@ export function FinanceView({ superadmin }: { superadmin: boolean }) {
       </form>
       <div className="table-wrap" style={{ marginTop: 12 }}>
         <table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Note</th></tr></thead>
-          <tbody>{data.expenses.map((item) => <tr key={item.id}><td>{item.spentOn.slice(0, 10)}</td><td>{item.category}</td><td>{inr(item.amount)}</td><td>{item.note}</td></tr>)}</tbody>
+          <tbody>{data.expenses.map((item) => <tr key={item.id}><td data-label="Date">{item.spentOn.slice(0, 10)}</td><td data-label="Category">{item.category}</td><td data-label="Amount">{inr(item.amount)}</td><td data-label="Note">{item.note}</td></tr>)}</tbody>
         </table>
       </div>
     </div>
@@ -193,7 +193,7 @@ export function CouponsView() {
       </form>
       <div className="table-wrap" style={{ marginTop: 12 }}>
         <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min</th><th>Used</th></tr></thead>
-          <tbody>{data.coupons.map((item) => <tr key={item.id}><td>{item.code}</td><td>{item.type}</td><td>{item.value}</td><td>{item.minOrder}</td><td>{item.usedCount}/{item.usageLimit || "∞"}</td></tr>)}</tbody>
+          <tbody>{data.coupons.map((item) => <tr key={item.id}><td data-label="Code">{item.code}</td><td data-label="Type">{item.type}</td><td data-label="Value">{item.value}</td><td data-label="Min">{item.minOrder}</td><td data-label="Used">{item.usedCount}/{item.usageLimit || "∞"}</td></tr>)}</tbody>
         </table>
       </div>
     </div>
@@ -247,7 +247,7 @@ export function ReportsView({ superadmin }: { superadmin: boolean }) {
           <button className="ghost no-print" type="button" onClick={() => window.print()}>Print / PDF</button>
           <table>
             <thead><tr>{report.columns.map((column) => <th key={column}>{column}</th>)}</tr></thead>
-            <tbody>{report.rows.map((row, index) => <tr key={index}>{report.columns.map((column) => <td key={column}>{row[column]}</td>)}</tr>)}</tbody>
+            <tbody>{report.rows.map((row, index) => <tr key={index}>{report.columns.map((column) => <td key={column} data-label={column}>{row[column]}</td>)}</tr>)}</tbody>
           </table>
         </div>
       ) : null}
@@ -308,7 +308,10 @@ export function SettingsView({ superadmin }: { superadmin: boolean }) {
         <button className="primary" type="submit">Add banner</button>
       </form>
       {banners.map((item) => (
-        <p key={item.id}>{item.title} · {item.href} <button className="text-btn danger" type="button" onClick={async () => { await adminJson(`/api/admin/banners/${item.id}`, { method: "DELETE" }); setBanners((await adminJson("/api/admin/banners")).banners); }}>Delete</button></p>
+        <div className="toy-row" key={item.id}>
+          <span><strong>{item.title}</strong> · {item.href}</span>
+          <button className="text-btn danger" type="button" onClick={async () => { await adminJson(`/api/admin/banners/${item.id}`, { method: "DELETE" }); setBanners((await adminJson("/api/admin/banners")).banners); }}>Delete</button>
+        </div>
       ))}
     </div>
   );

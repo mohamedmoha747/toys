@@ -58,12 +58,12 @@ export function OrdersView({ superadmin }: { superadmin: boolean }) {
           <tbody>
             {orders.map((order) => (
               <tr key={order.id}>
-                <td>{order.code}</td>
-                <td>{order.customerName}<div className="muted">{order.mobile}</div></td>
-                <td>{order.status}</td>
-                <td>{inr(order.grandTotal)}</td>
-                <td>{inr(order.amountCollected)}</td>
-                <td><button className="text-btn" type="button" onClick={() => setOpen(order)}>Open</button></td>
+                <td data-label="Order">{order.code}</td>
+                <td data-label="Customer">{order.customerName}<div className="muted">{order.mobile}</div></td>
+                <td data-label="Status">{order.status}</td>
+                <td data-label="Total">{inr(order.grandTotal)}</td>
+                <td data-label="Collected">{inr(order.amountCollected)}</td>
+                <td className="actions"><button className="text-btn" type="button" onClick={() => setOpen(order)}>Open</button></td>
               </tr>
             ))}
           </tbody>
@@ -72,12 +72,19 @@ export function OrdersView({ superadmin }: { superadmin: boolean }) {
       {open ? (
         <section className="panel" style={{ marginTop: 12 }}>
           <h2>{open.code}</h2>
-          <p>{open.customerName} · {open.mobile}</p>
-          <p>{open.address}</p>
-          <p>{open.paymentPreference === "upi" ? "UPI" : "Cash on delivery"} · {open.collectionStatus}</p>
-          {open.items.map((item) => <p key={item.productId}>{item.qty} × {item.name} · {inr(item.unitPrice)} = {inr(item.subtotal)}</p>)}
-          <p>Delivery {inr(open.deliveryCharge)} · Discount {inr(open.discount)} · Total {inr(open.grandTotal)}</p>
-          <pre style={{ whiteSpace: "pre-wrap" }}>{open.whatsappText}</pre>
+          <dl className="meta-list">
+            <div><dt>Customer</dt><dd>{open.customerName}</dd></div>
+            <div><dt>Phone</dt><dd>{open.mobile}</dd></div>
+            <div><dt>Address</dt><dd>{open.address}</dd></div>
+            <div><dt>Payment</dt><dd>{open.paymentPreference === "upi" ? "UPI" : "Cash on delivery"} · {open.collectionStatus}</dd></div>
+            <div><dt>Delivery</dt><dd>{inr(open.deliveryCharge)}</dd></div>
+            <div><dt>Discount</dt><dd>{inr(open.discount)}</dd></div>
+            <div><dt>Total</dt><dd>{inr(open.grandTotal)}</dd></div>
+          </dl>
+          <ul className="line-items">
+            {open.items.map((item) => <li key={item.productId}><span>{item.qty} × {item.name}</span><strong>{inr(item.subtotal)}</strong></li>)}
+          </ul>
+          <details className="fold"><summary>WhatsApp message</summary><pre>{open.whatsappText}</pre></details>
           <label className="field"><span>Status</span>
             <select value={open.status} onChange={(event) => save({ status: event.target.value })}>
               {orderStatuses.map((item) => <option key={item}>{item}</option>)}

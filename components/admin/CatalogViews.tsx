@@ -52,11 +52,11 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
           <tbody>
             {products.map((product) => (
               <tr key={product.id}>
-                <td><strong>{product.name}</strong><div className="muted">{product.sku}</div></td>
-                <td>{product.categoryName}</td>
-                <td>{inr(product.price)}</td>
-                <td>{product.stock}</td>
-                <td>{product.active ? "Yes" : "Hidden"}</td>
+                <td data-label="Toy"><strong>{product.name}</strong><div className="muted">{product.sku}</div></td>
+                <td data-label="Category">{product.categoryName}</td>
+                <td data-label="Price">{inr(product.price)}</td>
+                <td data-label="Stock">{product.stock}</td>
+                <td data-label="Active">{product.active ? "Yes" : "Hidden"}</td>
                 <td className="actions">
                   <button className="text-btn" type="button" onClick={() => setDraft({
                     id: product.id, name: product.name, categoryId: product.categoryId, brand: product.brand,
@@ -203,9 +203,9 @@ export function CategoriesView({ superadmin }: { superadmin: boolean }) {
           return (
             <article className="panel category-card" key={category.id}>
               <div className="admin-top">
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                   <strong>{category.name}</strong>
-                  <p className="muted">{toys.length} toy{toys.length === 1 ? "" : "s"}</p>
+                  <span className="count-pill">{toys.length} toy{toys.length === 1 ? "" : "s"}</span>
                 </div>
                 <div className="actions">
                   <button className="text-btn" type="button" onClick={() => setOpenId(open ? null : category.id)}>{open ? "Hide toys" : "Toys"}</button>
@@ -314,8 +314,8 @@ export function InventoryView({ superadmin }: { superadmin: boolean }) {
       </form> : <p className="muted">Stock adjustments are limited to the super admin.</p>}
       <div className="table-wrap" style={{ marginTop: 12 }}>
         <table>
-          <thead><tr><th>When</th><th>Product</th><th>Qty</th><th>Reason</th><th>Note</th></tr></thead>
-          <tbody>{data.movements.map((row) => <tr key={row.id}><td></td><td>{row.productName}</td><td>{row.qty}</td><td>{row.reason}</td><td>{row.note}</td></tr>)}</tbody>
+          <thead><tr><th>Product</th><th>Qty</th><th>Reason</th><th>Note</th></tr></thead>
+          <tbody>{data.movements.map((row) => <tr key={row.id}><td data-label="Product">{row.productName}</td><td data-label="Qty">{row.qty}</td><td data-label="Reason">{row.reason}</td><td data-label="Note">{row.note}</td></tr>)}</tbody>
         </table>
       </div>
     </div>

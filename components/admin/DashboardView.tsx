@@ -69,7 +69,7 @@ export function DashboardView() {
   return (
     <div>
       <h1>Overview</h1>
-      <form className="shop-search" style={{ margin: "12px 0" }} onSubmit={(event) => { event.preventDefault(); load(); }}>
+      <form className="admin-toolbar" onSubmit={(event) => { event.preventDefault(); load(); }}>
         <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} aria-label="From" />
         <input type="date" value={to} onChange={(event) => setTo(event.target.value)} aria-label="To" />
         <button className="primary" type="submit">Filter</button>
@@ -92,7 +92,15 @@ export function DashboardView() {
       </section>
       <section className="panel" style={{ marginTop: 16 }}>
         <h2>Recent activity</h2>
-        {data.activity.map((item) => <p key={item.id}><strong>{item.action}</strong> · {item.detail} · {item.userName}</p>)}
+        <ul className="activity-list">
+          {data.activity.map((item) => (
+            <li key={item.id}>
+              <strong>{item.action}</strong>
+              <span>{item.detail}</span>
+              <small>{item.userName}</small>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );
