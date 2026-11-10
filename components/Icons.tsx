@@ -31,6 +31,23 @@ export function IconBag({ className = "icon" }: Props) {
   );
 }
 
+export function IconHome({ className = "icon" }: Props) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconUser({ className = "icon" }: Props) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M5.5 19.2a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconMenu({ className = "icon" }: Props) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">

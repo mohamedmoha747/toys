@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Category, PublicSettings } from "@/lib/types";
 import { Brand } from "./Brand";
 
 export function Footer({ categories, settings }: { categories: Category[]; settings: PublicSettings }) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) return null;
 
   return (
     <footer className="site-footer">
@@ -25,7 +28,7 @@ export function Footer({ categories, settings }: { categories: Category[]; setti
             <li><Link href="/shop">Shop</Link></li>
             <li><Link href="/about">About</Link></li>
             <li><Link href="/contact">Contact</Link></li>
-            <li><Link href="/admin">Store admin</Link></li>
+            <li><Link href="/track">Track order</Link></li>
           </ul>
         </div>
         <div>

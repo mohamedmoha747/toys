@@ -228,6 +228,7 @@ export async function listBanners(): Promise<BannerSlide[]> {
 }
 
 export async function homeData() {
+  await connectDb();
   const [products, categories, banners, settings, reviewDocs] = await Promise.all([
     listProducts({}),
     listCategories(),

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { Category, PublicSettings } from "@/lib/types";
 import { waLink } from "@/lib/site";
 import { Brand } from "./Brand";
-import { IconBag, IconClose, IconHeart, IconMenu } from "./Icons";
+import { IconBag, IconClose, IconHeart, IconHome, IconMenu, IconUser } from "./Icons";
 import { SearchBar } from "./SearchBar";
 import { useStore } from "./StoreProvider";
 
@@ -15,6 +15,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const pathname = usePathname();
+  const onAdmin = pathname.startsWith("/admin");
 
   useEffect(() => {
     setOpen(false);
@@ -39,6 +40,8 @@ export function Header({ categories, settings }: { categories: Category[]; setti
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  if (onAdmin) return null;
+
   return (
     <>
       <a className="skip" href="#content">
@@ -57,7 +60,6 @@ export function Header({ categories, settings }: { categories: Category[]; setti
               <span>{settings.hours}</span>
               <span className="dot" />
               <a href={`tel:+${settings.phoneTel}`}>{settings.phone}</a>
-              <Link href="/admin">Admin</Link>
             </div>
           </div>
         </div>
@@ -110,14 +112,8 @@ export function Header({ categories, settings }: { categories: Category[]; setti
             </div>
             <Link href="/">Home</Link>
             <Link href="/shop">Shop</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
-            <Link href="/track">Track order</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/cart">Cart</Link>
             <Link href="/wishlist">Wishlist</Link>
             <Link href={user ? "/account" : "/login"}>{user ? "My account" : "Login"}</Link>
-            <Link href="/admin">Admin</Link>
             <h3>Categories</h3>
             {categories.map((category) => (
               <Link key={category.id} href={`/category/${category.slug}`}>
@@ -128,18 +124,25 @@ export function Header({ categories, settings }: { categories: Category[]; setti
         </div>
       ) : null}
       <nav className="bottom-nav" aria-label="Mobile">
-        <button type="button" onClick={() => setOpen(true)}>
+        <Link href="/" className={pathname === "/" ? "tab-on" : ""}>
+          <IconHome />
+          Home
+        </Link>
+        <Link href={user ? "/account" : "/login"} className={pathname.startsWith("/account") || pathname.startsWith("/login") ? "tab-on" : ""}>
+          <IconUser />
+          Account
+        </Link>
+        <Link href="/cart" className={pathname.startsWith("/cart") ? "tab-on bag-tab" : "bag-tab"}>
+          <span className="bag-wrap">
+            <IconBag />
+            {count > 0 ? <span className="count">{count}</span> : null}
+          </span>
+          Cart
+        </Link>
+        <button type="button" className={open ? "tab-on" : ""} onClick={() => setOpen(true)}>
           <IconMenu />
           Menu
         </button>
-        <Link href="/wishlist">
-          <IconHeart />
-          Wishlist
-        </Link>
-        <Link href="/cart">
-          <IconBag />
-          Cart ({count})
-        </Link>
       </nav>
     </>
   );
