@@ -52,6 +52,7 @@ const CategorySchema = new Schema(
 const ProductSchema = new Schema(
   {
     name: { type: String, required: true },
+    title: { type: String, default: "" },
     slug: { type: String, required: true, unique: true },
     description: { type: String, default: "" },
     brand: { type: String, default: "Limee Toys" },
@@ -236,6 +237,8 @@ const ActivitySchema = new Schema(
 );
 
 function register<T>(name: string, schema: Schema<T>) {
+  const current = models[name];
+  if (name === "Product" && current && !current.schema.path("title")) delete models[name];
   return models[name] || model<T>(name, schema);
 }
 

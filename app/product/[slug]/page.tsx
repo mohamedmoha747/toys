@@ -31,10 +31,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <ProductGallery product={product} />
         <div className="detail-copy">
           <p className="eyebrow">{product.brand} · Ages {product.ageGroup}</p>
+          {product.title ? <p className="muted">{product.title}</p> : null}
           <h1>{product.name}</h1>
           <p className="price">
             <strong style={{ fontSize: 28 }}>{inr(product.price)}</strong>
-            {product.comparePrice ? <s>{inr(product.comparePrice)}</s> : null}
+            {product.comparePrice ? <span className="muted">Our price</span> : null}
+            {product.comparePrice ? <s>MRP {inr(product.comparePrice)}</s> : null}
           </p>
           <p className={product.stock > 0 ? "muted" : "form-error"}>{stockLabel(product.stock)} · SKU {product.sku}</p>
           <p>{product.description}</p>

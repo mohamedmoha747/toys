@@ -6,9 +6,9 @@ import { ageGroups, type CategoryView, type ProductView } from "@/lib/types";
 import { adminJson } from "./AdminShell";
 
 const emptyProduct = {
-  name: "", categoryId: "", brand: "Limee Toys", ageGroup: "3-5", sku: "", description: "",
+  title: "", name: "", categoryId: "", brand: "Limee Toys", ageGroup: "3-5", sku: "", description: "",
   cost: "", price: "", discountPrice: "", tax: "0", stock: "10", minStock: "5",
-  featured: false, isNew: false, bestSeller: false, active: true, tone: "#ff7a18", images: [] as string[],
+  featured: false, isNew: false, bestSeller: false, active: true, tone: "#ff7a18", images: ["", "", ""] as string[],
 };
 
 export function ProductsView({ superadmin }: { superadmin: boolean }) {
@@ -59,12 +59,13 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
                 <td data-label="Active">{product.active ? "Yes" : "Hidden"}</td>
                 <td className="actions">
                   <button className="text-btn" type="button" onClick={() => setDraft({
-                    id: product.id, name: product.name, categoryId: product.categoryId, brand: product.brand,
+                    id: product.id, title: product.title, name: product.name, categoryId: product.categoryId, brand: product.brand,
                     ageGroup: product.ageGroup, sku: product.sku, description: product.description,
                     cost: String(product.cost), price: String(product.comparePrice || product.price),
                     discountPrice: product.comparePrice ? String(product.price) : "", tax: String(product.tax),
                     stock: String(product.stock), minStock: String(product.minStock), featured: product.featured,
-                    isNew: product.isNew, bestSeller: product.bestSeller, active: product.active, tone: product.tone, images: product.images,
+                    isNew: product.isNew, bestSeller: product.bestSeller, active: product.active, tone: product.tone,
+                    images: [product.images[0] || "", product.images[1] || "", product.images[2] || ""],
                   })}>Edit</button>
                   {superadmin ? <button className="text-btn danger" type="button" onClick={async () => {
                     if (!confirm(`Delete ${product.name}?`)) return;
@@ -80,8 +81,41 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
       {draft ? (
         <form className="panel" style={{ marginTop: 12 }} onSubmit={save}>
           <h2>{draft.id ? "Edit product" : "New product"}</h2>
+          <div className="image-slots">
+            {[0, 1, 2].map((index) => (
+              <label className="image-slot" key={index}>
+                {draft.images[index] ? <img src={draft.images[index]} alt="" /> : <span>Image {index + 1}</span>}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (!file || !draft) return;
+                    const body = new FormData();
+                    body.set("file", file);
+                    const res = await fetch("/api/admin/uploads", { method: "POST", body });
+                    const data = await res.json();
+                    if (!res.ok) {
+                      setError(data.error || "Upload failed");
+                      return;
+                    }
+                    const images = [...draft.images];
+                    images[index] = data.url;
+                    setDraft({ ...draft, images });
+                  }}
+                />
+              </label>
+            ))}
+          </div>
           <div className="form-grid two">
-            <label className="field"><span>Name</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} required /></label>
+            <label className="field"><span>Title</span><input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></label>
+            <label className="field"><span>Product name</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} required /></label>
+          </div>
+          <label className="field"><span>Description</span><textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
+          <div className="form-grid two">
+            <label className="field"><span>MRP rate</span><input inputMode="decimal" value={draft.price} onChange={(event) => setDraft({ ...draft, price: event.target.value })} disabled={!superadmin && Boolean(draft.id)} required /></label>
+            <label className="field"><span>Our price</span><input inputMode="decimal" value={draft.discountPrice} onChange={(event) => setDraft({ ...draft, discountPrice: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>SKU</span><input value={draft.sku} onChange={(event) => setDraft({ ...draft, sku: event.target.value })} /></label>
             <label className="field"><span>Category</span>
               <select value={draft.categoryId} onChange={(event) => setDraft({ ...draft, categoryId: event.target.value })}>
@@ -94,25 +128,11 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
                 {ageGroups.map((age) => <option key={age}>{age}</option>)}
               </select>
             </label>
-            <label className="field"><span>Selling price</span><input value={draft.price} onChange={(event) => setDraft({ ...draft, price: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
-            <label className="field"><span>Discount price</span><input value={draft.discountPrice} onChange={(event) => setDraft({ ...draft, discountPrice: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Cost</span><input value={draft.cost} onChange={(event) => setDraft({ ...draft, cost: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Tax %</span><input value={draft.tax} onChange={(event) => setDraft({ ...draft, tax: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Stock</span><input value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Alert at</span><input value={draft.minStock} onChange={(event) => setDraft({ ...draft, minStock: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
           </div>
-          <label className="field"><span>Description</span><textarea rows={3} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
-          <label className="field"><span>Upload images</span><input type="file" accept="image/*" onChange={async (event) => {
-            const file = event.target.files?.[0];
-            if (!file) return;
-            const body = new FormData();
-            body.set("file", file);
-            const res = await fetch("/api/admin/uploads", { method: "POST", body });
-            const data = await res.json();
-            if (res.ok) setDraft({ ...draft, images: [...draft.images, data.url] });
-            else setError(data.error || "Upload failed");
-          }} /></label>
-          <p className="muted">{draft.images.join(", ") || "No photos yet. The toy illustration is used until you upload."}</p>
           <label className="check"><input type="checkbox" checked={draft.featured} onChange={(event) => setDraft({ ...draft, featured: event.target.checked })} /> Featured</label>
           <label className="check"><input type="checkbox" checked={draft.isNew} onChange={(event) => setDraft({ ...draft, isNew: event.target.checked })} /> New arrival</label>
           <label className="check"><input type="checkbox" checked={draft.bestSeller} onChange={(event) => setDraft({ ...draft, bestSeller: event.target.checked })} /> Best seller</label>

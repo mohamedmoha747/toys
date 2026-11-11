@@ -38,6 +38,7 @@ export type CategoryView = Category & { productCount: number };
 export type ProductView = {
   id: string;
   name: string;
+  title: string;
   slug: string;
   description: string;
   brand: string;

@@ -54,13 +54,14 @@ export async function saveProduct(body: Record<string, unknown>, user: SessionUs
   const slug = await uniqueSlug(name, id);
   const payload = {
     name,
+    title: String(body.title ?? existing?.get("title") ?? "").trim().slice(0, 80),
     slug,
     description: String(body.description ?? existing?.description ?? "").trim().slice(0, 800),
     brand: String(body.brand || existing?.brand || "Limee Toys").trim().slice(0, 40),
     ageGroup: String(body.ageGroup || existing?.ageGroup || "3-5"),
     sku,
     category: category._id,
-    images: Array.isArray(body.images) ? body.images.map(String).slice(0, 6) : existing?.images || [],
+    images: Array.isArray(body.images) ? body.images.map(String).filter(Boolean).slice(0, 3) : existing?.images || [],
     tone: /^#[0-9a-fA-F]{6}$/.test(String(body.tone || "")) ? String(body.tone) : existing?.tone || "#f5a524",
     kind: category.kind,
     cost: Math.max(0, num(body.cost ?? existing?.cost, 0)),

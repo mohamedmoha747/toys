@@ -18,6 +18,7 @@ type LeanCategory = { _id: unknown; name: string; slug: string; kind: CategoryKi
 type LeanProduct = {
   _id: unknown;
   name: string;
+  title?: string;
   slug: string;
   description?: string;
   brand?: string;
@@ -56,6 +57,7 @@ export function toProduct(doc: LeanProduct, revealCost = false): ProductView {
   return {
     id: String(doc._id),
     name: doc.name,
+    title: doc.title || "",
     slug: doc.slug,
     description: doc.description || "",
     brand: doc.brand || "Limee Toys",
