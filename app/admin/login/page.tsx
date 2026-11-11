@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
         window.location.href = "/admin";
       }}
     >
-      <p className="eyebrow">Limee Toys admin</p>
+      <p className="eyebrow">Limee enterprise</p>
       <h1>Store login</h1>
       <p className="muted">Super admin: admin@limeetoys.com / limee-admin. Staff: staff@limeetoys.com / staff-demo</p>
       <label className="field"><span>Email</span><input value={email} onChange={(event) => setEmail(event.target.value)} required /></label>

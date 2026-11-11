@@ -22,7 +22,7 @@ const links = [
   ["Settings", "/admin/settings"],
 ];
 
-export function AdminShell({ name, role, children }: { name: string; role: string; children: React.ReactNode }) {
+export function AdminShell({ role, children }: { name: string; role: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const items = links.filter(([label]) => role === "superadmin" || label !== "Finance");
@@ -49,7 +49,7 @@ export function AdminShell({ name, role, children }: { name: string; role: strin
   const nav = (
     <>
       <div className="admin-who">
-        <strong>{name}</strong>
+        <strong>Limee enterprise</strong>
         <span className="muted">{role}</span>
         <button className="admin-logout" type="button" onClick={logout}>
           Log out
