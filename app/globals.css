@@ -278,6 +278,14 @@ main { min-height: 58vh; }
 .eyebrow { color: #2f6bff; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-size: 12px; }
 .banner-copy .eyebrow { color: #fff; }
 .admin-login .eyebrow { color: var(--gold); text-transform: none; }
+.admin-login-logo {
+  height: 96px;
+  width: auto;
+  max-width: 210px;
+  object-fit: contain;
+  justify-self: center;
+  mix-blend-mode: screen;
+}
 .banner-copy h2 { font-size: clamp(32px, 5vw, 58px); line-height: 0.95; letter-spacing: -0.045em; }
 .banner-copy p { color: #d7dbe6; font-size: 16px; }
 .banner-copy .enquiry { width: fit-content; margin-top: 6px; }
@@ -452,7 +460,8 @@ main { min-height: 58vh; }
   border: 1px solid var(--line);
 }
 .cart-row { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center; }
-.cart-row .visual { border-radius: 12px; aspect-ratio: 1; }
+.cart-row .visual { border-radius: 12px; aspect-ratio: 1; overflow: hidden; }
+.cart-row img.visual { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
 .summary { display: grid; gap: 8px; margin-top: 14px; }
 .summary .total { font-size: 20px; }
 

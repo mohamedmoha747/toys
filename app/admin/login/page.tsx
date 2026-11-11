@@ -25,6 +25,7 @@ export default function AdminLoginPage() {
         window.location.href = "/admin";
       }}
     >
+      <img className="admin-login-logo" src="/lm-logo.png" alt="Limee enterprise" />
       <p className="eyebrow">Limee enterprise</p>
       <h1>Store login</h1>
       <p className="muted">Super admin: admin@limeetoys.com / limee-admin. Staff: staff@limeetoys.com / staff-demo</p>

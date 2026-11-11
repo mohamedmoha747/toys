@@ -51,7 +51,13 @@ export default function CartPage() {
           <div className="cart-list">
             {rows.map(({ line, product }) => (
               <article className="cart-row" key={line.id}>
-                {product ? <ProductVisual kind={product.kind} tone={product.tone} /> : <div className="visual" />}
+                {product?.images[0] ? (
+                  <img className="visual" src={product.images[0]} alt="" />
+                ) : product ? (
+                  <ProductVisual kind={product.kind} tone={product.tone} />
+                ) : (
+                  <div className="visual" />
+                )}
                 <div>
                   {product ? (
                     <h2>
