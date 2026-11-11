@@ -1009,3 +1009,102 @@ body:has(.admin-frame) .bottom-nav {
   .admin-frame .shop-search button,
   .admin-frame .shop-search .ghost { justify-self: start; }
 }
+
+/* Warm admin theme: cream pages, gold highlights, teal actions */
+body:has(.admin-frame),
+body:has(.admin-login) {
+  background: #f6f1e6;
+  color: #3a3228;
+}
+body:has(.admin-login) .site-header,
+body:has(.admin-login) .site-footer,
+body:has(.admin-login) .bottom-nav {
+  display: none !important;
+}
+.admin-bar {
+  background: #fffdf8;
+  color: #3a3228;
+  border-bottom: 3px solid #e2b657;
+  box-shadow: 0 1px 0 rgba(226, 182, 87, 0.35);
+}
+.admin-bar .icon-btn,
+.admin-drawer .icon-btn { color: #3a3228; }
+.admin-logout {
+  border-color: #d7b56a;
+  color: #6a4b12;
+  background: #fff8e8;
+}
+.admin-who .admin-logout { color: #6a4b12; }
+.admin-nav,
+.admin-drawer,
+.admin-login {
+  background: #fffdf8;
+  border-color: #eadcbe;
+}
+.admin-nav a,
+.admin-drawer a { color: #3a3228; }
+.admin-nav a.on,
+.admin-drawer a.on {
+  background: #f6e3a8;
+  color: #5c3e08;
+  border: 1px solid #e2b657;
+}
+.admin-frame .primary,
+.admin-toolbar .primary,
+.profile-actions .primary,
+.admin-login .primary,
+.admin-frame .shop-search .primary {
+  background: #0f766e;
+  color: #fff;
+  border: 0;
+}
+.admin-frame .ghost,
+.admin-frame a.ghost,
+.profile-actions .ghost,
+.admin-frame .shop-search .ghost {
+  background: #fff;
+  color: #0f766e;
+  border: 1px solid #8ecfc6;
+}
+.admin-frame .text-btn { color: #0f766e; }
+.admin-frame .text-btn.danger { color: #b42318; }
+.activity-list strong {
+  background: #f6e3a8;
+  color: #5c3e08;
+}
+.admin-frame .avatar-cam { background: #0f766e; color: #fff; }
+.admin-frame .stat {
+  background: #fffdf8;
+  border: 1px solid #eadcbe;
+  border-top: 3px solid #e2b657;
+}
+.admin-frame .panel,
+.admin-frame .table-wrap,
+.admin-frame .info-card {
+  background: #fffdf8;
+  border-color: #eadcbe;
+}
+.admin-frame th {
+  background: #fff6e2;
+  color: #6b5420;
+}
+.admin-frame .field input,
+.admin-frame .field select,
+.admin-frame .field textarea,
+.admin-login .field input,
+.admin-frame .shop-search input,
+.admin-frame .shop-search select,
+.admin-toolbar input {
+  border-color: #eadcbe;
+  color: #3a3228;
+}
+.profile-tabs button.on { color: #0f766e; box-shadow: inset 0 -2px 0 #0f766e; }
+.admin-main h1,
+.admin-login h1 { color: #3a3228; }
+@media (max-width: 700px) {
+  .admin-frame tr {
+    background: #fffdf8;
+    border: 1px solid #eadcbe;
+    box-shadow: none;
+  }
+}

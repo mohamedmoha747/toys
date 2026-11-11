@@ -9,7 +9,7 @@ export default function AdminLoginPage() {
 
   return (
     <form
-      className="login-card"
+      className="login-card admin-login"
       onSubmit={async (event) => {
         event.preventDefault();
         const res = await fetch("/api/auth/login", {
