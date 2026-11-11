@@ -1,5 +1,6 @@
 import { assertSuper } from "./auth";
 import { ServiceError } from "./errors";
+import { invalidatePublic } from "./cache";
 import { connectDb } from "./mongodb";
 import {
   ActivityModel,
@@ -58,7 +59,7 @@ export async function saveProduct(body: Record<string, unknown>, user: SessionUs
     slug,
     description: String(body.description ?? existing?.description ?? "").trim().slice(0, 800),
     brand: String(body.brand || existing?.brand || "Limee Toys").trim().slice(0, 40),
-    ageGroup: String(body.ageGroup || existing?.ageGroup || "3-5"),
+    ageGroup: String(body.ageGroup || existing?.ageGroup || ""),
     sku,
     category: category._id,
     images: Array.isArray(body.images) ? body.images.map(String).filter(Boolean).slice(0, 3) : existing?.images || [],
@@ -77,6 +78,7 @@ export async function saveProduct(body: Record<string, unknown>, user: SessionUs
   };
   const doc = existing ? Object.assign(existing, payload) : new ProductModel(payload);
   await doc.save();
+  invalidatePublic();
   await logActivity(id ? "product.updated" : "product.created", name, user);
   return getProduct(String(doc._id), true);
 }
@@ -90,10 +92,12 @@ export async function removeProduct(id: string, user: SessionUser) {
   if (used) {
     product.active = false;
     await product.save();
+    invalidatePublic();
     await logActivity("product.hidden", product.name, user);
     return { hidden: true };
   }
   await product.deleteOne();
+  invalidatePublic();
   await logActivity("product.deleted", product.name, user);
   return { deleted: true };
 }
@@ -110,6 +114,7 @@ export async function saveCategory(body: Record<string, unknown>, user: SessionU
   const payload = { name, slug, kind, description: String(body.description || "").trim().slice(0, 240) };
   const doc = existing ? Object.assign(existing, payload) : await CategoryModel.create(payload);
   if (existing) await doc.save();
+  invalidatePublic();
   await logActivity(id ? "category.updated" : "category.created", name, user);
   return { id: String(doc._id), ...payload };
 }
@@ -120,6 +125,7 @@ export async function removeCategory(id: string, user: SessionUser) {
   if (await ProductModel.exists({ category: id })) throw new ServiceError("Move or delete this category's products first");
   const category = await CategoryModel.findByIdAndDelete(id);
   if (!category) throw new ServiceError("Category not found", 404);
+  invalidatePublic();
   await logActivity("category.deleted", category.name, user);
 }
 
@@ -148,6 +154,7 @@ export async function adjustStock(body: Record<string, unknown>, user: SessionUs
     userName: user.name,
   });
   await logActivity("stock.adjusted", `${product.name} ${direction < 0 ? "-" : "+"}${qty}`, user);
+  invalidatePublic();
   return getProduct(String(product._id), true);
 }
 
@@ -337,6 +344,7 @@ export async function approvePurchase(id: string, user: SessionUser) {
   }
   purchase.status = "approved";
   await purchase.save();
+  invalidatePublic();
   await logActivity("purchase.approved", purchase.supplierName, user);
   return purchase;
 }
@@ -436,6 +444,7 @@ export async function moderateReview(id: string, approved: boolean, user: Sessio
   if (!review) throw new ServiceError("Review not found", 404);
   review.approved = approved;
   await review.save();
+  invalidatePublic();
   await logActivity("review.moderated", `${approved ? "Approved" : "Hidden"} review`, user);
   return review;
 }
@@ -472,6 +481,7 @@ export async function updateSettings(body: Record<string, unknown>, user: Sessio
     };
   }
   await settings.save();
+  invalidatePublic();
   await logActivity("settings.updated", settings.storeName, user);
   return getSettings();
 }
@@ -494,6 +504,7 @@ export async function saveBanner(body: Record<string, unknown>, user: SessionUse
   if (id && !doc) throw new ServiceError("Banner not found", 404);
   Object.assign(doc!, payload);
   await doc!.save();
+  invalidatePublic();
   await logActivity(id ? "banner.updated" : "banner.created", payload.title, user);
   return doc;
 }
@@ -507,6 +518,7 @@ export async function listBannersAdmin() {
 export async function removeBanner(id: string, user: SessionUser) {
   await connectDb();
   await BannerModel.findByIdAndDelete(id);
+  invalidatePublic();
   await logActivity("banner.deleted", id, user);
 }
 

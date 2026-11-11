@@ -105,7 +105,7 @@ async function runSeed() {
         return {
           name: item[0],
           slug: item[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
-          description: `${item[0]} from ${item[2]}. Suitable for ages ${item[3]}. Ready for play, with spare parts available from the Limee Toys counter.`,
+          description: `${item[0]} from ${item[2]}. Ready for play, with spare parts available from the Limee Toys counter.`,
           brand: item[2],
           ageGroup: item[3],
           sku: `LT-${String(index + 1).padStart(4, "0")}`,

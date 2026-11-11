@@ -1,4 +1,5 @@
 import { CouponModel, OrderModel, ProductModel, SettingsModel } from "./models";
+import { invalidatePublic } from "./cache";
 import { connectDb } from "./mongodb";
 import { ServiceError } from "./errors";
 import { digits, getSettings, logActivity, whatsappMessage } from "./shop";
@@ -236,8 +237,10 @@ async function changeStock(order: { code: string; items: { product?: unknown; na
     for (const item of applied) {
       await ProductModel.updateOne({ _id: item.id }, { $inc: { stock: direction < 0 ? item.qty : -item.qty } });
     }
+    invalidatePublic();
     throw error;
   }
+  invalidatePublic();
 }
 
 export async function updateOrder(id: string, input: Record<string, unknown>, user: SessionUser) {

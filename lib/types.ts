@@ -22,7 +22,6 @@ export const orderStatuses = [
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
 
-export const ageGroups = ["0-2", "3-5", "6-8", "9-12", "13+"] as const;
 export type Role = "customer" | "staff" | "superadmin";
 
 export type Category = {
@@ -42,7 +41,6 @@ export type ProductView = {
   slug: string;
   description: string;
   brand: string;
-  ageGroup: string;
   sku: string;
   categoryId: string;
   categoryName: string;

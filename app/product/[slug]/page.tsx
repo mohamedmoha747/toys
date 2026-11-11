@@ -30,7 +30,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <div className="detail-grid detail" style={{ marginTop: 16 }}>
         <ProductGallery product={product} />
         <div className="detail-copy">
-          <p className="eyebrow">{product.brand} · Ages {product.ageGroup}</p>
+          <p className="eyebrow">{product.brand}</p>
           {product.title ? <p className="muted">{product.title}</p> : null}
           <h1>{product.name}</h1>
           <p className="price">

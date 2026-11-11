@@ -12,7 +12,6 @@ export async function GET(req: Request) {
         category: url.searchParams.get("category") || undefined,
         q: url.searchParams.get("q") || undefined,
         brand: url.searchParams.get("brand") || undefined,
-        age: url.searchParams.get("age") || undefined,
         min: Number(url.searchParams.get("min") || 0) || undefined,
         max: Number(url.searchParams.get("max") || 0) || undefined,
         stock: url.searchParams.get("stock") || undefined,

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { slugify } from "./format";
+import { cached, invalidatePublic, PUBLIC_TTL_MS } from "./cache";
 import { connectDb } from "./mongodb";
 import { ServiceError } from "./errors";
 import {
@@ -22,7 +23,6 @@ type LeanProduct = {
   slug: string;
   description?: string;
   brand?: string;
-  ageGroup?: string;
   sku?: string;
   category?: LeanCategory | null;
   images?: string[];
@@ -59,9 +59,8 @@ export function toProduct(doc: LeanProduct, revealCost = false): ProductView {
     name: doc.name,
     title: doc.title || "",
     slug: doc.slug,
-    description: doc.description || "",
+    description: (doc.description || "").replace(/\s*Suitable for ages [^.]+\./gi, "").replace(/\s{2,}/g, " ").trim(),
     brand: doc.brand || "Limee Toys",
-    ageGroup: doc.ageGroup || "",
     sku: doc.sku || "",
     categoryId: category ? String(category._id) : "",
     categoryName: category?.name || "Shop",
@@ -98,6 +97,10 @@ export function digits(phone: string) {
 }
 
 export async function getSettings(): Promise<PublicSettings> {
+  return cached("public:settings", PUBLIC_TTL_MS, loadSettings);
+}
+
+async function loadSettings(): Promise<PublicSettings> {
   await connectDb();
   const doc = await SettingsModel.findOne().lean();
   const settings = (doc || {}) as {
@@ -134,7 +137,13 @@ export async function getSettings(): Promise<PublicSettings> {
 }
 
 export async function listCategories(): Promise<CategoryView[]> {
-  await connectDb();
+  return cached("public:categories", PUBLIC_TTL_MS, async () => {
+    await connectDb();
+    return loadCategories();
+  });
+}
+
+async function loadCategories(): Promise<CategoryView[]> {
   const categories = (await CategoryModel.find().sort({ name: 1 }).lean()) as unknown as LeanCategory[];
   const counts = await ProductModel.aggregate<{ _id: unknown; count: number }>([
     { $match: { active: true } },
@@ -148,7 +157,6 @@ export type CatalogQuery = {
   category?: string;
   q?: string;
   brand?: string;
-  age?: string;
   min?: number;
   max?: number;
   stock?: string;
@@ -158,20 +166,32 @@ export type CatalogQuery = {
   includeInactive?: boolean;
 };
 
-export async function listProducts(query: CatalogQuery = {}) {
-  await connectDb();
-  const filter: Record<string, unknown> = {};
-  if (!query.includeInactive) filter.active = true;
-  if (query.ids?.length) filter._id = { $in: query.ids.filter((id) => /^[a-f0-9]{24}$/i.test(id)) };
-  const docs = (await ProductModel.find(filter).populate("category").sort({ createdAt: -1 }).lean()) as unknown as LeanProduct[];
-  let items = docs.map((doc) => ({ view: toProduct(doc, query.includeInactive), createdAt: new Date(doc.createdAt || 0).getTime() }));
+type ProductRow = { view: ProductView; createdAt: number };
 
+async function loadProductDocs(includeInactive: boolean) {
+  const filter: Record<string, unknown> = {};
+  if (!includeInactive) filter.active = true;
+  return (await ProductModel.find(filter).populate("category").sort({ createdAt: -1 }).lean()) as unknown as LeanProduct[];
+}
+
+function rowsFrom(docs: LeanProduct[], revealCost: boolean): ProductRow[] {
+  return docs.map((doc) => ({
+    view: toProduct(doc, revealCost),
+    createdAt: new Date(doc.createdAt || 0).getTime(),
+  }));
+}
+
+function filterProductRows(rows: ProductRow[], query: CatalogQuery) {
+  let items = [...rows];
+  if (query.ids?.length) {
+    const ids = new Set(query.ids.filter((id) => /^[a-f0-9]{24}$/i.test(id)));
+    items = items.filter((item) => ids.has(item.view.id));
+  }
   if (query.category && query.category !== "all") {
     const key = query.category.toLowerCase();
     items = items.filter((item) => item.view.categorySlug === key || item.view.categoryId === query.category);
   }
   if (query.brand) items = items.filter((item) => item.view.brand.toLowerCase() === query.brand!.toLowerCase());
-  if (query.age) items = items.filter((item) => item.view.ageGroup === query.age);
   if (query.deals) items = items.filter((item) => item.view.comparePrice);
   if (query.stock === "in") items = items.filter((item) => item.view.stock > 0);
   if (query.stock === "out") items = items.filter((item) => item.view.stock <= 0);
@@ -180,7 +200,7 @@ export async function listProducts(query: CatalogQuery = {}) {
   if (query.q?.trim()) {
     const q = query.q.trim().toLowerCase();
     items = items.filter((item) =>
-      [item.view.name, item.view.description, item.view.brand, item.view.categoryName, item.view.sku, item.view.ageGroup]
+      [item.view.name, item.view.description, item.view.brand, item.view.categoryName, item.view.sku]
         .join(" ")
         .toLowerCase()
         .includes(q),
@@ -196,7 +216,23 @@ export async function listProducts(query: CatalogQuery = {}) {
   return items.map((item) => item.view);
 }
 
+export async function listProducts(query: CatalogQuery = {}) {
+  if (query.includeInactive) {
+    await connectDb();
+    return filterProductRows(rowsFrom(await loadProductDocs(true), true), query);
+  }
+  const rows = await cached("public:catalog", PUBLIC_TTL_MS, async () => {
+    await connectDb();
+    return rowsFrom(await loadProductDocs(false), false);
+  });
+  return filterProductRows(rows, query);
+}
+
 export async function getProduct(key: string, revealCost = false) {
+  if (!revealCost) {
+    const products = await listProducts({});
+    return products.find((item) => item.slug === key || item.id === key || item.sku === key) || null;
+  }
   await connectDb();
   const doc = (await ProductModel.findOne({ $or: [{ slug: key }, { sku: key }] })
     .populate("category")
@@ -215,7 +251,13 @@ export async function relatedProducts(product: ProductView) {
 }
 
 export async function listBanners(): Promise<BannerSlide[]> {
-  await connectDb();
+  return cached("public:banners", PUBLIC_TTL_MS, async () => {
+    await connectDb();
+    return loadBanners();
+  });
+}
+
+async function loadBanners(): Promise<BannerSlide[]> {
   const docs = await BannerModel.find({ active: true }).sort({ sort: 1 }).lean();
   return docs.map((doc) => ({
     id: String(doc._id),
@@ -230,13 +272,15 @@ export async function listBanners(): Promise<BannerSlide[]> {
 }
 
 export async function homeData() {
-  await connectDb();
   const [products, categories, banners, settings, reviewDocs] = await Promise.all([
     listProducts({}),
     listCategories(),
     listBanners(),
     getSettings(),
-    ReviewModel.find({ approved: true }).sort({ createdAt: -1 }).limit(8).lean(),
+    cached("public:home-reviews", PUBLIC_TTL_MS, async () => {
+      await connectDb();
+      return ReviewModel.find({ approved: true }).sort({ createdAt: -1 }).limit(8).lean();
+    }),
   ]);
   return {
     settings,
@@ -252,21 +296,24 @@ export async function homeData() {
     best: products.filter((item) => item.bestSeller).slice(0, 4),
     deals: products.filter((item) => item.comparePrice).slice(0, 4),
     brands: [...new Set(products.map((item) => item.brand))].sort(),
-    ages: [...new Set(products.map((item) => item.ageGroup))],
+    products,
   };
 }
 
 export async function filterMeta() {
-  const products = await listProducts({});
-  const categories = await listCategories();
+  const [products, categories] = await Promise.all([listProducts({}), listCategories()]);
   return {
     categories,
     brands: [...new Set(products.map((item) => item.brand))].sort(),
-    ages: [...new Set(products.map((item) => item.ageGroup))],
   };
 }
 
 export async function listReviews(productId: string, approvedOnly = false): Promise<ReviewView[]> {
+  if (approvedOnly) return cached(`public:reviews:${productId}`, PUBLIC_TTL_MS, () => queryReviews(productId, true));
+  return queryReviews(productId, false);
+}
+
+async function queryReviews(productId: string, approvedOnly: boolean): Promise<ReviewView[]> {
   await connectDb();
   const filter: Record<string, unknown> = { product: productId };
   if (approvedOnly) filter.approved = true;
@@ -296,6 +343,7 @@ export async function addReview(input: { productId: string; authorName: string; 
     text: input.text.trim().slice(0, 600),
     approved: false,
   });
+  invalidatePublic();
   return listReviews(String(product._id)).then((items) => items.find((item) => item.id === String(doc._id)));
 }
 

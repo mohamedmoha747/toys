@@ -2,12 +2,12 @@ import { Banner } from "@/components/Banner";
 import { CategoryRail } from "@/components/CategoryRail";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Reviews } from "@/components/Reviews";
-import { homeData, listProducts } from "@/lib/shop";
+import { homeData } from "@/lib/shop";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [data, products] = await Promise.all([homeData(), listProducts({})]);
+  const data = await homeData();
 
   return (
     <>
@@ -17,7 +17,7 @@ export default async function HomePage() {
         <div className="section-head">
           <h2 className="section-title">All products</h2>
         </div>
-        <ProductGrid products={products} />
+        <ProductGrid products={data.products} />
       </section>
       <Reviews reviews={data.reviews} />
     </>

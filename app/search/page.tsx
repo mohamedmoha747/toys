@@ -17,7 +17,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div className="page-head">
         <p className="crumbs"><Link href="/">Home</Link> / Search</p>
         <h1>{query ? `Results for “${query}”` : "Search toys"}</h1>
-        <p className="muted">{query ? `${shown.length} match${shown.length === 1 ? "" : "es"}.` : "Search by name, brand, age or category."}</p>
+        <p className="muted">{query ? `${shown.length} match${shown.length === 1 ? "" : "es"}.` : "Search by name, brand or category."}</p>
       </div>
       <ProductGrid products={shown} />
     </div>

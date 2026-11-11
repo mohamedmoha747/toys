@@ -8,7 +8,6 @@ type Filters = {
   category: string;
   query: string;
   brand: string;
-  age: string;
   min: string;
   max: string;
   stock: string;
@@ -20,13 +19,11 @@ export function ShopBrowser({
   initialProducts,
   categories,
   brands,
-  ages,
   initial,
 }: {
   initialProducts: ProductView[];
   categories: CategoryView[];
   brands: string[];
-  ages: string[];
   initial: Filters;
 }) {
   const [products, setProducts] = useState(initialProducts);
@@ -42,7 +39,6 @@ export function ShopBrowser({
     if (next.category !== "all") params.set("category", next.category);
     if (next.query.trim()) params.set("q", next.query.trim());
     if (next.brand) params.set("brand", next.brand);
-    if (next.age) params.set("age", next.age);
     if (next.min) params.set("min", next.min);
     if (next.max) params.set("max", next.max);
     if (next.stock) params.set("stock", next.stock);
@@ -81,10 +77,6 @@ export function ShopBrowser({
           <select aria-label="Brand" value={filters.brand} onChange={(event) => load({ ...filters, brand: event.target.value })}>
             <option value="">All brands</option>
             {brands.map((brand) => <option key={brand}>{brand}</option>)}
-          </select>
-          <select aria-label="Age group" value={filters.age} onChange={(event) => load({ ...filters, age: event.target.value })}>
-            <option value="">All ages</option>
-            {ages.map((age) => <option key={age} value={age}>Ages {age}</option>)}
           </select>
           <select aria-label="Availability" value={filters.stock} onChange={(event) => load({ ...filters, stock: event.target.value })}>
             <option value="">Any stock</option>

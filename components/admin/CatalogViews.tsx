@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { inr } from "@/lib/format";
-import { ageGroups, type CategoryView, type ProductView } from "@/lib/types";
+import type { CategoryView, ProductView } from "@/lib/types";
 import { adminJson } from "./AdminShell";
 
 const emptyProduct = {
-  title: "", name: "", categoryId: "", brand: "Limee Toys", ageGroup: "3-5", sku: "", description: "",
-  cost: "", price: "", discountPrice: "", tax: "0", stock: "10", minStock: "5",
+  title: "", name: "", categoryId: "", brand: "Limee Toys", description: "",
+  price: "", discountPrice: "", stock: "10", minStock: "5",
   featured: false, isNew: false, bestSeller: false, active: true, tone: "#ff7a18", images: ["", "", ""] as string[],
 };
 
@@ -60,9 +60,9 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
                 <td className="actions">
                   <button className="text-btn" type="button" onClick={() => setDraft({
                     id: product.id, title: product.title, name: product.name, categoryId: product.categoryId, brand: product.brand,
-                    ageGroup: product.ageGroup, sku: product.sku, description: product.description,
-                    cost: String(product.cost), price: String(product.comparePrice || product.price),
-                    discountPrice: product.comparePrice ? String(product.price) : "", tax: String(product.tax),
+                    description: product.description,
+                    price: String(product.comparePrice || product.price),
+                    discountPrice: product.comparePrice ? String(product.price) : "",
                     stock: String(product.stock), minStock: String(product.minStock), featured: product.featured,
                     isNew: product.isNew, bestSeller: product.bestSeller, active: product.active, tone: product.tone,
                     images: [product.images[0] || "", product.images[1] || "", product.images[2] || ""],
@@ -116,20 +116,12 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
           <div className="form-grid two">
             <label className="field"><span>MRP rate</span><input inputMode="decimal" value={draft.price} onChange={(event) => setDraft({ ...draft, price: event.target.value })} disabled={!superadmin && Boolean(draft.id)} required /></label>
             <label className="field"><span>Our price</span><input inputMode="decimal" value={draft.discountPrice} onChange={(event) => setDraft({ ...draft, discountPrice: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
-            <label className="field"><span>SKU</span><input value={draft.sku} onChange={(event) => setDraft({ ...draft, sku: event.target.value })} /></label>
             <label className="field"><span>Category</span>
               <select value={draft.categoryId} onChange={(event) => setDraft({ ...draft, categoryId: event.target.value })}>
                 {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
               </select>
             </label>
             <label className="field"><span>Brand</span><input value={draft.brand} onChange={(event) => setDraft({ ...draft, brand: event.target.value })} /></label>
-            <label className="field"><span>Age</span>
-              <select value={draft.ageGroup} onChange={(event) => setDraft({ ...draft, ageGroup: event.target.value })}>
-                {ageGroups.map((age) => <option key={age}>{age}</option>)}
-              </select>
-            </label>
-            <label className="field"><span>Cost</span><input value={draft.cost} onChange={(event) => setDraft({ ...draft, cost: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
-            <label className="field"><span>Tax %</span><input value={draft.tax} onChange={(event) => setDraft({ ...draft, tax: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Stock</span><input value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
             <label className="field"><span>Alert at</span><input value={draft.minStock} onChange={(event) => setDraft({ ...draft, minStock: event.target.value })} disabled={!superadmin && Boolean(draft.id)} /></label>
           </div>
