@@ -62,7 +62,7 @@ export function ShopBrowser({
       <div className="filters">
         <div className="pills">
           <button className={`pill ${filters.category === "all" ? "on" : ""}`} type="button" onClick={() => load({ ...filters, category: "all" })}>
-            All
+            All products
           </button>
           {categories.map((item) => (
             <button key={item.id} className={`pill ${filters.category === item.slug ? "on" : ""}`} type="button" onClick={() => load({ ...filters, category: item.slug })}>

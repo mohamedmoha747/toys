@@ -90,7 +90,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
           </div>
         </div>
         <nav className="cat-links" aria-label="Categories">
-          <Link href="/shop">Shop all</Link>
+          <Link href="/shop">All products</Link>
           {categories.map((category) => (
             <Link key={category.id} href={`/category/${category.slug}`}>
               {category.name}
@@ -102,9 +102,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
         <div className="drawer-backdrop" onClick={() => setOpen(false)}>
           <aside className="drawer" role="dialog" aria-label="Menu" onClick={(event) => event.stopPropagation()}>
             <div className="drawer-head">
-              <span className="drawer-brand">
-                <img src="/lm-logo.png" alt="LM" className="brand-logo" />
-              </span>
+              <Brand />
               <button className="icon-btn" type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
                 <IconClose />
               </button>
@@ -113,12 +111,15 @@ export function Header({ categories, settings }: { categories: Category[]; setti
             <Link href="/shop">Shop</Link>
             <Link href="/wishlist">Wishlist</Link>
             <Link href={user ? "/account" : "/login"}>{user ? "My account" : "Login"}</Link>
-            <h3>Categories</h3>
-            {categories.map((category) => (
-              <Link key={category.id} href={`/category/${category.slug}`}>
-                {category.name}
-              </Link>
-            ))}
+            <div className="drawer-cats">
+              <h3>Categories</h3>
+              <Link href="/shop">All products</Link>
+              {categories.map((category) => (
+                <Link key={category.id} href={`/category/${category.slug}`}>
+                  {category.name}
+                </Link>
+              ))}
+            </div>
           </aside>
         </div>
       ) : null}

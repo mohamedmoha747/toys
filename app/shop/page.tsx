@@ -40,8 +40,8 @@ export default async function ShopPage({
     <div className="wrap page">
       <div className="page-head">
         <p className="crumbs">Home / Shop</p>
-        <h1>Shop</h1>
-        <p className="muted">Filter by category, age, brand, price and stock.</p>
+        <h1>{initial.category === "all" ? "All products" : "Shop"}</h1>
+        <p className="muted">All products are listed here. Choose a category when you want a smaller set.</p>
       </div>
       <ShopBrowser initialProducts={products} categories={meta.categories} brands={meta.brands} ages={meta.ages} initial={initial} />
     </div>

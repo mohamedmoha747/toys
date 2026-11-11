@@ -6,6 +6,12 @@ export function CategoryRail({ categories }: { categories: Category[] }) {
   return (
     <section className="rail-wrap" aria-label="Shop by category">
       <div className="wrap rail">
+        <Link href="/shop" className="rail-item">
+          <span className="rail-bubble">
+            <KindIcon kind="parts" />
+          </span>
+          <span>All products</span>
+        </Link>
         {categories.map((category) => (
           <Link key={category.id} href={`/category/${category.slug}`} className="rail-item">
             <span className="rail-bubble">

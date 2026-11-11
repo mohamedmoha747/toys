@@ -1,6 +1,6 @@
 export const site = {
-  name: "Limee Toys",
-  fullName: "Limee Toys",
+  name: "Limee enterprise",
+  fullName: "Limee enterprise",
   tagline: "Race more. Fly higher.",
   phone: "+91 98765 43210",
   phoneTel: "919876543210",

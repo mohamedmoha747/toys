@@ -2,8 +2,11 @@ import Link from "next/link";
 
 export function Brand() {
   return (
-    <Link href="/" className="brand" aria-label="Limee Toys home">
-      <img src="/lm-logo.png" alt="LM" className="brand-logo" />
+    <Link href="/" className="brand" aria-label="Limee enterprise home">
+      <img src="/lm-logo.png" alt="" className="brand-logo" />
+      <span className="brand-text">
+        <span className="brand-mark">Limee enterprise</span>
+      </span>
     </Link>
   );
 }
