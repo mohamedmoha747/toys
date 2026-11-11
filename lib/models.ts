@@ -236,9 +236,19 @@ const ActivitySchema = new Schema(
   { timestamps: true },
 );
 
+const MediaSchema = new Schema(
+  {
+    data: { type: Buffer, required: true },
+    contentType: { type: String, required: true },
+    size: { type: Number, required: true },
+  },
+  { timestamps: true },
+);
+
 function register<T>(name: string, schema: Schema<T>) {
   const current = models[name];
   if (name === "Product" && current && !current.schema.path("title")) delete models[name];
+  if (name === "Media" && current && !current.schema.path("data")) delete models[name];
   return models[name] || model<T>(name, schema);
 }
 
@@ -255,3 +265,4 @@ export const CouponModel = register("Coupon", CouponSchema);
 export const ReviewModel = register("Review", ReviewSchema);
 export const BannerModel = register("Banner", BannerSchema);
 export const ActivityModel = register("Activity", ActivitySchema);
+export const MediaModel = register("Media", MediaSchema);

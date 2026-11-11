@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { inr } from "@/lib/format";
 import type { CategoryView, ProductView } from "@/lib/types";
+import { postAdminImage } from "@/lib/images";
 import { adminJson } from "./AdminShell";
 
 const emptyProduct = {
@@ -92,17 +93,15 @@ export function ProductsView({ superadmin }: { superadmin: boolean }) {
                     const file = event.target.files?.[0];
                     event.target.value = "";
                     if (!file || !draft) return;
-                    const body = new FormData();
-                    body.set("file", file);
-                    const res = await fetch("/api/admin/uploads", { method: "POST", body });
-                    const data = await res.json();
-                    if (!res.ok) {
-                      setError(data.error || "Upload failed");
-                      return;
+                    setError("");
+                    try {
+                      const url = await postAdminImage(file);
+                      const images = [...draft.images];
+                      images[index] = url;
+                      setDraft({ ...draft, images });
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Upload failed");
                     }
-                    const images = [...draft.images];
-                    images[index] = data.url;
-                    setDraft({ ...draft, images });
                   }}
                 />
               </label>

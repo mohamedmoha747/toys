@@ -3,6 +3,7 @@ import { slugify } from "./format";
 import { cached, invalidatePublic, PUBLIC_TTL_MS } from "./cache";
 import { connectDb } from "./mongodb";
 import { ServiceError } from "./errors";
+import { isAllowedProfilePhoto } from "./images";
 import {
   ActivityModel,
   BannerModel,
@@ -455,7 +456,7 @@ export async function updateStaffProfile(userId: string, body: Record<string, un
   const taken = await UserModel.exists({ email, _id: { $ne: user._id } });
   if (taken) throw new ServiceError("That email is already used");
   const photo = String(body.photo ?? user.photo ?? "").trim().slice(0, 240);
-  if (photo && !photo.startsWith("/uploads/")) throw new ServiceError("Upload a photo from this page");
+  if (photo && !isAllowedProfilePhoto(photo)) throw new ServiceError("Upload a photo from this page");
   user.name = name;
   user.email = email;
   user.mobile = String(body.mobile ?? user.mobile ?? "").trim().slice(0, 20);

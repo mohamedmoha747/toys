@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { postAdminImage } from "@/lib/images";
 import { adminJson } from "./AdminShell";
 
 type Profile = {
@@ -108,15 +109,12 @@ export function AccountView() {
                   event.target.value = "";
                   if (!file) return;
                   setError("");
-                  const body = new FormData();
-                  body.set("file", file);
-                  const res = await fetch("/api/admin/uploads", { method: "POST", body });
-                  const data = await res.json();
-                  if (!res.ok) {
-                    setError(data.error || "Upload failed");
-                    return;
+                  try {
+                    const url = await postAdminImage(file);
+                    setDraft({ ...draft, photo: url });
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Upload failed");
                   }
-                  setDraft({ ...draft, photo: data.url });
                 }}
               />
             </label>
