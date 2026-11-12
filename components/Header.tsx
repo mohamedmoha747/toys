@@ -90,7 +90,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
           </div>
         </div>
         <nav className="cat-links" aria-label="Categories">
-          <Link href="/shop">All products</Link>
+          <Link href="/shop">All toys</Link>
           {categories.map((category) => (
             <Link key={category.id} href={`/category/${category.slug}`}>
               {category.name}
@@ -113,7 +113,7 @@ export function Header({ categories, settings }: { categories: Category[]; setti
             <Link href={user ? "/account" : "/login"}>{user ? "My account" : "Login"}</Link>
             <div className="drawer-cats">
               <h3>Categories</h3>
-              <Link href="/shop">All products</Link>
+              <Link href="/shop">All toys</Link>
               {categories.map((category) => (
                 <Link key={category.id} href={`/category/${category.slug}`}>
                   {category.name}

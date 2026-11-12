@@ -41,6 +41,7 @@ export type ProductView = {
   slug: string;
   description: string;
   brand: string;
+  ageGroup: string;
   sku: string;
   categoryId: string;
   categoryName: string;

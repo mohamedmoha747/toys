@@ -24,6 +24,7 @@ type LeanProduct = {
   slug: string;
   description?: string;
   brand?: string;
+  ageGroup?: string;
   sku?: string;
   category?: LeanCategory | null;
   images?: string[];
@@ -62,6 +63,7 @@ export function toProduct(doc: LeanProduct, revealCost = false): ProductView {
     slug: doc.slug,
     description: (doc.description || "").replace(/\s*Suitable for ages [^.]+\./gi, "").replace(/\s{2,}/g, " ").trim(),
     brand: doc.brand || "Limee Toys",
+    ageGroup: doc.ageGroup || "",
     sku: doc.sku || "",
     categoryId: category ? String(category._id) : "",
     categoryName: category?.name || "Shop",
@@ -160,6 +162,8 @@ export type CatalogQuery = {
   brand?: string;
   min?: number;
   max?: number;
+  ageFrom?: number;
+  ageTo?: number;
   stock?: string;
   sort?: string;
   deals?: boolean;
@@ -182,6 +186,17 @@ function rowsFrom(docs: LeanProduct[], revealCost: boolean): ProductRow[] {
   }));
 }
 
+function ageSpan(value: string) {
+  const text = value.trim();
+  const range = text.match(/(\d+)\s*[-–]\s*(\d+)/);
+  if (range) return { from: Number(range[1]), to: Number(range[2]) };
+  const plus = text.match(/(\d+)\s*\+/);
+  if (plus) return { from: Number(plus[1]), to: 18 };
+  const one = text.match(/(\d+)/);
+  if (one) return { from: Number(one[1]), to: Number(one[1]) };
+  return null;
+}
+
 function filterProductRows(rows: ProductRow[], query: CatalogQuery) {
   let items = [...rows];
   if (query.ids?.length) {
@@ -189,8 +204,10 @@ function filterProductRows(rows: ProductRow[], query: CatalogQuery) {
     items = items.filter((item) => ids.has(item.view.id));
   }
   if (query.category && query.category !== "all") {
-    const key = query.category.toLowerCase();
-    items = items.filter((item) => item.view.categorySlug === key || item.view.categoryId === query.category);
+    const keys = query.category.split(",").map((item) => item.trim().toLowerCase()).filter((item) => item && item !== "all");
+    if (keys.length) {
+      items = items.filter((item) => keys.includes(item.view.categorySlug) || keys.includes(item.view.categoryId));
+    }
   }
   if (query.brand) items = items.filter((item) => item.view.brand.toLowerCase() === query.brand!.toLowerCase());
   if (query.deals) items = items.filter((item) => item.view.comparePrice);
@@ -198,6 +215,15 @@ function filterProductRows(rows: ProductRow[], query: CatalogQuery) {
   if (query.stock === "out") items = items.filter((item) => item.view.stock <= 0);
   if (query.min) items = items.filter((item) => item.view.price >= query.min!);
   if (query.max) items = items.filter((item) => item.view.price <= query.max!);
+  if (query.ageFrom != null || query.ageTo != null) {
+    const from = query.ageFrom ?? 0;
+    const to = query.ageTo ?? 18;
+    items = items.filter((item) => {
+      const span = ageSpan(item.view.ageGroup);
+      if (!span) return false;
+      return span.from <= to && span.to >= from;
+    });
+  }
   if (query.q?.trim()) {
     const q = query.q.trim().toLowerCase();
     items = items.filter((item) =>
@@ -212,7 +238,7 @@ function filterProductRows(rows: ProductRow[], query: CatalogQuery) {
   else if (query.sort === "price-desc") items.sort((a, b) => b.view.price - a.view.price);
   else if (query.sort === "name") items.sort((a, b) => a.view.name.localeCompare(b.view.name));
   else if (query.sort === "newest") items.sort((a, b) => b.createdAt - a.createdAt);
-  else items.sort((a, b) => Number(b.view.featured) - Number(a.view.featured) || a.view.name.localeCompare(b.view.name));
+  else items.sort((a, b) => Number(b.view.bestSeller) - Number(a.view.bestSeller) || Number(b.view.featured) - Number(a.view.featured) || a.view.name.localeCompare(b.view.name));
 
   return items.map((item) => item.view);
 }

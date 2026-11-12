@@ -28,6 +28,7 @@ export default function RegisterPage() {
         router.refresh();
       }}
     >
+      <img className="auth-logo" src="/lm-logo.png" alt="Limee enterprise" />
       <h1>Create account</h1>
       {(["name", "email", "mobile", "password"] as const).map((field) => (
         <label className="field" key={field}>

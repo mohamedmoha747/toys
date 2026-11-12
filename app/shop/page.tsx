@@ -5,43 +5,45 @@ import { filterMeta, listProducts } from "@/lib/shop";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Shop" };
 
+function optionalNumber(value?: string) {
+  if (!value?.trim()) return undefined;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : undefined;
+}
+
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; q?: string; brand?: string; min?: string; max?: string; sort?: string; deals?: string }>;
+  searchParams: Promise<{ category?: string; q?: string; min?: string; max?: string; ageFrom?: string; ageTo?: string; sort?: string }>;
 }) {
   const params = await searchParams;
+  const categories = params.category && params.category !== "all" ? params.category.split(",").map((item) => item.trim()).filter(Boolean) : [];
   const initial = {
-    category: params.category || "all",
+    categories,
     query: params.q || "",
-    brand: params.brand || "",
     min: params.min || "",
     max: params.max || "",
-    stock: "",
-    sort: params.sort || "featured",
-    deals: params.deals === "1",
+    ageFrom: params.ageFrom || "",
+    ageTo: params.ageTo || "",
+    sort: params.sort || "popular",
   };
   const [products, meta] = await Promise.all([
     listProducts({
-      category: initial.category,
+      category: categories.join(",") || "all",
       q: initial.query,
-      brand: initial.brand,
-      min: Number(initial.min) || undefined,
-      max: Number(initial.max) || undefined,
+      min: optionalNumber(initial.min),
+      max: optionalNumber(initial.max),
+      ageFrom: optionalNumber(initial.ageFrom),
+      ageTo: optionalNumber(initial.ageTo),
       sort: initial.sort,
-      deals: initial.deals,
     }),
     filterMeta(),
   ]);
 
   return (
     <div className="wrap page">
-      <div className="page-head">
-        <p className="crumbs">Home / Shop</p>
-        <h1>{initial.category === "all" ? "All products" : "Shop"}</h1>
-        <p className="muted">All products are listed here. Choose a category when you want a smaller set.</p>
-      </div>
-      <ShopBrowser initialProducts={products} categories={meta.categories} brands={meta.brands} initial={initial} />
+      <p className="crumbs"><a href="/">Home</a> / Shop</p>
+      <ShopBrowser initialProducts={products} categories={meta.categories} initial={initial} titleAs="h1" />
     </div>
   );
 }

@@ -3,6 +3,12 @@ import { jsonError } from "@/lib/errors";
 
 export const dynamic = "force-dynamic";
 
+function optionalNumber(value: string | null) {
+  if (value == null || value.trim() === "") return undefined;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : undefined;
+}
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
@@ -14,6 +20,8 @@ export async function GET(req: Request) {
         brand: url.searchParams.get("brand") || undefined,
         min: Number(url.searchParams.get("min") || 0) || undefined,
         max: Number(url.searchParams.get("max") || 0) || undefined,
+        ageFrom: optionalNumber(url.searchParams.get("ageFrom")),
+        ageTo: optionalNumber(url.searchParams.get("ageTo")),
         stock: url.searchParams.get("stock") || undefined,
         sort: url.searchParams.get("sort") || undefined,
         deals: url.searchParams.get("deals") === "1",

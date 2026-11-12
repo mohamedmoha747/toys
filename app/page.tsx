@@ -1,7 +1,7 @@
 import { Banner } from "@/components/Banner";
 import { CategoryRail } from "@/components/CategoryRail";
-import { ProductGrid } from "@/components/ProductGrid";
 import { Reviews } from "@/components/Reviews";
+import { ShopBrowser } from "@/components/ShopBrowser";
 import { homeData } from "@/lib/shop";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +14,11 @@ export default async function HomePage() {
       <CategoryRail categories={data.categories} />
       <Banner slides={data.banners} />
       <section className="section wrap">
-        <div className="section-head">
-          <h2 className="section-title">All products</h2>
-        </div>
-        <ProductGrid products={data.products} />
+        <ShopBrowser
+          initialProducts={data.products}
+          categories={data.categories}
+          initial={{ categories: [], query: "", min: "", max: "", ageFrom: "", ageTo: "", sort: "popular" }}
+        />
       </section>
       <Reviews reviews={data.reviews} />
     </>

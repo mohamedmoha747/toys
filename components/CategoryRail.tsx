@@ -10,7 +10,7 @@ export function CategoryRail({ categories }: { categories: Category[] }) {
           <span className="rail-bubble">
             <KindIcon kind="parts" />
           </span>
-          <span>All products</span>
+          <span>All toys</span>
         </Link>
         {categories.map((category) => (
           <Link key={category.id} href={`/category/${category.slug}`} className="rail-item">

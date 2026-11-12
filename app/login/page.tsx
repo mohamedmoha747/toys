@@ -30,7 +30,7 @@ export default function LoginPage() {
         router.refresh();
       }}
     >
-      <p className="eyebrow">Limee Toys</p>
+      <img className="auth-logo" src="/lm-logo.png" alt="Limee enterprise" />
       <h1>Login</h1>
       <label className="field"><span>Email</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
       <label className="field"><span>Password</span><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
