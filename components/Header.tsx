@@ -128,9 +128,9 @@ export function Header({ categories, settings }: { categories: Category[]; setti
           <IconHome />
           Home
         </Link>
-        <Link href={user ? "/account" : "/login"} className={pathname.startsWith("/account") || pathname.startsWith("/login") ? "tab-on" : ""}>
-          <IconUser />
-          Account
+        <Link href="/wishlist" className={pathname.startsWith("/wishlist") ? "tab-on" : ""}>
+          <IconHeart />
+          Wishlist
         </Link>
         <Link href="/cart" className={pathname.startsWith("/cart") ? "tab-on bag-tab" : "bag-tab"}>
           <span className="bag-wrap">
@@ -139,10 +139,10 @@ export function Header({ categories, settings }: { categories: Category[]; setti
           </span>
           Cart
         </Link>
-        <button type="button" className={open ? "tab-on" : ""} onClick={() => setOpen(true)}>
-          <IconMenu />
-          Menu
-        </button>
+        <Link href={user ? "/account" : "/login"} className={pathname.startsWith("/account") || pathname.startsWith("/login") || pathname.startsWith("/register") ? "tab-on" : ""}>
+          <IconUser />
+          Profile
+        </Link>
       </nav>
     </>
   );
