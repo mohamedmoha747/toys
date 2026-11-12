@@ -58,6 +58,13 @@ main { min-height: 58vh; }
 .nav-main { display: flex; align-items: center; gap: 16px; min-height: 74px; min-width: 0; max-width: 100%; }
 .brand { display: flex; align-items: center; gap: 10px; line-height: 1; margin-right: auto; min-width: 0; }
 .brand-logo { height: 54px; width: auto; max-width: 132px; object-fit: contain; flex: 0 0 auto; background: transparent; }
+.site-header .brand-logo-plate {
+  display: flex;
+  background: #101114;
+  border-radius: 10px;
+  isolation: isolate;
+  line-height: 0;
+}
 .site-header .brand-logo { mix-blend-mode: screen; }
 .brand-text { display: grid; justify-items: start; min-width: 0; }
 .brand-mark {
